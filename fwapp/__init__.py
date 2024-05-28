@@ -33,3 +33,5 @@ from fwapp.admin.route import admin_route
 app.register_blueprint(admin_route)
 from fwapp.users.route import users_route
 app.register_blueprint(users_route)
+from fwapp.quickbuild.route import quickbuild_route
+app.register_blueprint(quickbuild_route)
