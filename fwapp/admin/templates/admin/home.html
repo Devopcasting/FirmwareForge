@@ -44,6 +44,7 @@
                             </tbody>
                       </table>
                     {% endif %}
+                    <!--Pagination-->
                     <div class="rounded-0 col-lg-13 mx-auto">
                         {% for page_num in list_of_users.iter_pages(left_edge=1,right_edge=1,left_current=1,right_current=2) %}
                           {% if page_num %}
