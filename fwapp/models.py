@@ -28,10 +28,12 @@ class User(db.Model, UserMixin):
 
 class QuickBuildFirmware(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    firmware_client_name = db.Column(db.String(20), nullable=False)
     firmware_name = db.Column(db.String(20), unique=True, nullable=False)
     firmware_version = db.Column(db.String(20), nullable=False)
     firmware_description = db.Column(db.String(100), nullable=False)
     firmware_date = db.Column(db.DateTime, nullable=False, default=datetime.now)
-    firmware_size = db.Column(db.String(20), nullable=False, default='default.bin')
+    firmware_size = db.Column(db.String(20), nullable=False)
     firmware_log = db.Column(db.String(200), nullable=False)
+    firmware_download_link = db.Column(db.String(200), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
