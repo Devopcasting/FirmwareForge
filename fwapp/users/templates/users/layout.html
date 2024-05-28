@@ -47,15 +47,15 @@
             </header>
             <div class="container">
               {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-          {% for category,message in messages %}
-              <div class="alert alert-{{category}} alert-dismissible fade show mt-2" role="alert">
-                  <strong>{{message}}</strong>
-                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-              </div>
-          {% endfor %}
-        {% endif %}
-      {% endwith %} 
+                {% if messages %}
+                  {% for category,message in messages %}
+                    <div class="alert alert-{{category}} alert-dismissible fade show mt-2" role="alert">
+                      <strong>{{message}}</strong>
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              {% endwith %} 
               {%block content%}{%endblock content%}
             </div>
             <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
