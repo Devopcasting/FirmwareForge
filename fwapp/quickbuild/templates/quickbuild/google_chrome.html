@@ -3,14 +3,14 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{url_for('quickbuild.home')}}">Quick Firmware Build</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Firefox</li>
+            <li class="breadcrumb-item active" aria-current="page">Google Chrome</li>
         </ol>
     </nav>
     <div class="row">
         <div class="col-xl-7 col-lg-12 order-lg-2 order-xl-1">
             <div class="card mt-5">
                 <div class="d-flex card-header justify-content-between align-items-center">
-                    <h4 class="header-title">Firefox</h4>
+                    <h4 class="header-title">Google Chrome</h4>
                 </div>
                 <div class="card-body pt-0">
                     <form method="post" action="" class="mt-3 form-horizontal" id="buildForm">
@@ -61,8 +61,8 @@
                         <p class="mb-0" id="uploadSpinnerText">Quick Firmware Build started ...</p>
                         
                     </div>
-                    <div>
-                        <img src="{{url_for('static', filename='images/mozilla-firefox.svg')}}" alt="Build in progress" width="200" height="200">
+                    <div class="mt-4">
+                        <img src="{{url_for('static', filename='images/google-chrome.svg')}}" alt="Build in progress" width="150" height="150">
                     </div>
                 </div>
             </div>

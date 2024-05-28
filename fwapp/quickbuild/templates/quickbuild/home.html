@@ -35,11 +35,30 @@
                                         <td>{{firmware.firmware_client_name}}</td>
                                         <td>{{firmware.firmware_name}}</td>
                                         <td>{{firmware.firmware_size}}</td>
+                                        <td>
+                                            <a href="{{firmware.firmware_download_link}}" class="action-icon download" target="_blank"><i class="bi bi-download"></i></a>
+                                            <a href="{{url_for('quickbuild.firmware_delete', firmware_id=firmware.id)}}" class="action-icon delete"><i class="bi bi-x-circle"></i></a>
+                                            <a href="{{url_for('quickbuild.info', id=firmware.id)}}" class="action-icon info"><i class="bi bi-info-circle"></i></a>
+                                        </td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     {% endif %}
+                    <!--Pagination-->
+                    <div class="rounded-0 col-lg-13 mx-auto">
+                        {% for page_num in quickbuild_firmware_list.iter_pages(left_edge=1,right_edge=1,left_current=1,right_current=2) %}
+                          {% if page_num %}
+                            {% if quickbuild_firmware_list.page == page_num %}
+                              <a class="btn btn-primary btn-sm mb-4 mt-2" href="{{ url_for('quickbuild.home',page=page_num)}}">{{ page_num }}</a>
+                            {% else %}
+                              <a class="btn btn-primary btn-sm mb-4 mt-2" href="{{ url_for('quickbuild.home',page=page_num)}}">{{ page_num }}</a>
+                            {% endif %}  
+                          {% else %}
+                            ...
+                          {% endif %}
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
         </div>
@@ -51,9 +70,8 @@
                 <div class="card-body pt-0">
                     <ul class="list-group list-group-horizontal mt-4">
                         <li class="list-group-item"><a href="{{url_for('quickbuild.firefox')}}" class="text-decoration-none">Firefox</a></li>
-                        <li class="list-group-item"><a href="#" class="text-decoration-none">Google Chrome</a></li>
-                        <li class="list-group-item"><a href="#" class="text-decoration-none">Vmware Horizon</a></li>
-                        
+                        <li class="list-group-item"><a href="{{url_for('quickbuild.chrome')}}" class="text-decoration-none">Google Chrome</a></li>
+                        <li class="list-group-item"><a href="{{url_for('quickbuild.vmware_horizon')}}" class="text-decoration-none">VMware Horizon Client</a></li>
                     </ul>
                     <ul class="list-group list-group-horizontal mt-4">
                         <li class="list-group-item"><a href="#" class="text-decoration-none">Citrix Workspace</a></li>
@@ -77,6 +95,22 @@
         font-size: 1.2rem;
         display: inline-block;
         padding: 0 3px;
+        text-decoration: none;
+    }
+    .delete.action-icon:hover {
+        color: red;
+    }
+    .download.action-icon:hover {
+        color: darkorange;
+    }
+    .info.action-icon:hover {
+        color: cornflowerblue;
+    }
+    a:hover{
+        color: black;
+    }
+    .list-group-item:hover {
+        background-color: darkgray;
     }
 </style>
 {% endblock styles %}

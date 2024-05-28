@@ -3,14 +3,14 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{url_for('quickbuild.home')}}">Quick Firmware Build</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Firefox</li>
+            <li class="breadcrumb-item active" aria-current="page">VMware Horizon Client</li>
         </ol>
     </nav>
     <div class="row">
         <div class="col-xl-7 col-lg-12 order-lg-2 order-xl-1">
             <div class="card mt-5">
                 <div class="d-flex card-header justify-content-between align-items-center">
-                    <h4 class="header-title">Firefox</h4>
+                    <h4 class="header-title">VMware Horizon Client</h4>
                 </div>
                 <div class="card-body pt-0">
                     <form method="post" action="" class="mt-3 form-horizontal" id="buildForm">
@@ -19,12 +19,23 @@
                             <label for="inputEmail3" class="col-3 col-form-label">Client</label>
                             <div class="col-9">
                                 {{form.client_name(class="form-control", id="clientname")}}
+                                
                             </div>
                         </div>
                         <div class="row mb-3">
                             <label for="inputPassword3" class="col-3 col-form-label">Description</label>
                             <div class="col-9">
                                 {{form.description(class="form-control", id=description)}}
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="inputPassword3" class="col-3 col-form-label">Source URL</label>
+                            <div class="col-9">
+                                {{form.source_url(class="form-control", id=sourceurl)}}
+                                <p>
+                                    <small>Give the URL for VMware Horizon Client bundle installer.</small>
+                                    <small><a href="https://customerconnect.omnissa.com/downloads/info/slug/desktop_end_user_computing/vmware_horizon_clients/horizon_8" target="_blank">Copy Source URL</a></small>
+                                </p>
                             </div>
                         </div>
                         <div class="justify-content-end row">
@@ -62,7 +73,7 @@
                         
                     </div>
                     <div>
-                        <img src="{{url_for('static', filename='images/mozilla-firefox.svg')}}" alt="Build in progress" width="200" height="200">
+                        <img src="{{url_for('static', filename='images/vmware.svg')}}" alt="Build in progress" width="180" height="180">
                     </div>
                 </div>
             </div>
