@@ -24,7 +24,9 @@
                 </li>
                   {% if current_user.role != 'admin' %}
                     <li class="nav-item"><a href="#" class="nav-link">Firmware Build</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link">Quick Firmware Build</a></li>
+                    <li class="nav-item">
+                      <a href="{{url_for('quickbuild.home')}}" class="nav-link {% if 'Quick Firmware Build' in title %}active{% endif %}">Quick Firmware Build</a>
+                    </li>
                   {% else %}
                     <li class="nav-item">
                       <a href="{{url_for('admin.add_new_user')}}" class="nav-link {% if 'Add User' in title %}active{% endif %}">Add User</a>
