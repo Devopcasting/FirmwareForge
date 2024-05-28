@@ -1,0 +1,82 @@
+{% extends 'users/layout.html'%}
+{% block content %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{url_for('users.home')}}">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Quick Firmware Build</li>
+        </ol>
+    </nav>
+    <div class="row">
+        <div class="col-xl-7 col-lg-12 order-lg-2 order-xl-1">
+            <div class="card mt-5">
+                <div class="d-flex card-header justify-content-between align-items-center">
+                    <h4 class="header-title">Quick Firmware Builds</h4>
+                </div>
+                <div class="card-body pt-0">
+                    {% if total_quickbuild_firmware == 0 %}
+                        <div class="alert alert-info mt-3" role="alert">
+                            No Firmware found.
+                        </div>
+                    {% else %}
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Build</th>
+                                    <th scope="col">Client</th>
+                                    <th scope="col">Patch</th>
+                                    <th scope="col">Size</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for firmware in quickbuild_firmware_list %}
+                                    <tr>
+                                        <td>{{firmware.firmware_version}}</td>
+                                        <td>{{firmware.firmware_client_name}}</td>
+                                        <td>{{firmware.firmware_name}}</td>
+                                        <td>{{firmware.firmware_size}}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-5 col-lg-12 order-lg-2 order-xl-1">
+            <div class="card mt-5">
+                <div class="d-flex card-header justify-content-between align-items-center">
+                    <h4 class="header-title">Quick Firmware Build Packages</h4>
+                </div>
+                <div class="card-body pt-0">
+                    <ul class="list-group list-group-horizontal mt-4">
+                        <li class="list-group-item"><a href="{{url_for('quickbuild.firefox')}}" class="text-decoration-none">Firefox</a></li>
+                        <li class="list-group-item"><a href="#" class="text-decoration-none">Google Chrome</a></li>
+                        <li class="list-group-item"><a href="#" class="text-decoration-none">Vmware Horizon</a></li>
+                        
+                    </ul>
+                    <ul class="list-group list-group-horizontal mt-4">
+                        <li class="list-group-item"><a href="#" class="text-decoration-none">Citrix Workspace</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+{% block styles %}
+<style>
+    .header-title {
+        margin-bottom: .5rem;
+        text-transform: uppercase;
+        letter-spacing: .02em;
+        font-size: .9rem;
+        margin-top: 0;
+    }
+    .table .action-icon {
+        color: var(--ct-secondary-color);
+        font-size: 1.2rem;
+        display: inline-block;
+        padding: 0 3px;
+    }
+</style>
+{% endblock styles %}
