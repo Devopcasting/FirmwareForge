@@ -22,7 +22,7 @@ def user_login():
                 if user.is_admin():
                     return redirect(next_page) if next_page else redirect(url_for('admin.home'))
                 else:
-                    pass
+                    return redirect(next_page) if next_page else redirect(url_for('users.home'))   
             else:
                 flash('Your account is not active. Please contact the administrator', 'danger')
                 return redirect(url_for('login.user_login'))
