@@ -20,3 +20,11 @@ class QuickFirmwareBuildVmwareHorizonForm(FlaskForm):
     source_url = StringField('Source URL', validators=[DataRequired()])
     description = TextAreaField('Description', validators=[DataRequired()])
     submit = SubmitField('Build')
+
+# Quick Firmware Build Citrix Workspace App
+class QuickFirmwareBuildCitrixWorkspaceAppForm(FlaskForm):
+    client_name = StringField('Name', validators=[DataRequired()])
+    icaclient_url = StringField('ICAClient URL', validators=[DataRequired()])
+    ctxusb_url = StringField('CTXUSB', validators=[DataRequired()])
+    description = TextAreaField('Description', validators=[DataRequired()])
+    submit = SubmitField('Build')

@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, flash, url_for,
 from fwapp import db, login_manager
 from flask_login import current_user, login_required
 from fwapp.models import User, QuickBuildFirmware
-from fwapp.quickbuild.form import QuickFirmwareBuildFirefoxForm, QuickFirmwareBuildChromeForm, QuickFirmwareBuildVmwareHorizonForm
+from fwapp.quickbuild.form import QuickFirmwareBuildFirefoxForm, QuickFirmwareBuildChromeForm, QuickFirmwareBuildVmwareHorizonForm, QuickFirmwareBuildCitrixWorkspaceAppForm
 import os
 import random
 import subprocess
@@ -24,6 +24,11 @@ CHROME_BUILD_SCRIPT = os.path.abspath(os.path.join(os.path.join("fwapp", "static
 VMWARE_BUILD_PATH = os.path.abspath(os.path.join(os.path.join("fwapp", "static", "vmware_build")))
 # Vmware Patch Build Script
 VMWARE_BUILD_SCRIPT = os.path.abspath(os.path.join(os.path.join("fwapp", "static", "vmware_build", "vmware_build.sh")))
+
+# Citrix Workspace App Patch Build path
+CITRIX_BUILD_PATH = os.path.abspath(os.path.join(os.path.join("fwapp", "static", "citrix_build")))
+# Citrix Workspace App Patch Build Script
+CITRIX_BUILD_SCRIPT = os.path.abspath(os.path.join(os.path.join("fwapp", "static", "citrix_build", "citrix_build.sh")))
 
 # Get the size of patch
 def get_file_size(file_path) -> str:
@@ -215,6 +220,14 @@ def vmware_horizon():
             flash('Error: Build Failed', 'danger')
             return redirect(url_for('quickbuild.home'))
     return render_template('quickbuild/vmware_horizon.html', title="User | VMware Horizon Quick Firmware Build", form=form)
+
+# Build Citrix Workspace App
+@quickbuild_route.route('/quickbuild/citrix_workspace_app', methods=['GET', 'POST'])
+@login_required
+def citrix_workspace_app():
+    log_content = None
+    form = QuickFirmwareBuildCitrixWorkspaceAppForm()
+    return render_template('quickbuild/citrix_workspace_app.html', title="User | Citrix Workspace App Quick Firmware Build", form=form)
 
 # Build Information
 @quickbuild_route.route('/quickbuild/info/<int:id>')
