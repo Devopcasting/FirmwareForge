@@ -24,7 +24,7 @@
                             </thead>
                             <tbody>
                                 {% for user in list_of_users %}
-                                    <tr>
+                                    <tr >
                                         <td><img src="{{url_for('static', filename='images/'+user.image_file)}}" alt="mdo" width="32" height="32" class="rounded-circle"></td>
                                         <td>{{user.username}}</td>
                                         <td>{{user.email}}</td>
