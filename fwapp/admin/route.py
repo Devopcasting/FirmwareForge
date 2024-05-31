@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, request
 from flask_login import logout_user, current_user, login_required
 from fwapp import db, bcrypt
+# from flask_mail import Message
 from fwapp.models import User, QuickBuildFirmware
 from fwapp.admin.form import AddUserForm, EditUserForm
 from functools import wraps
@@ -44,6 +45,9 @@ def add_new_user():
         user = User(username=form.username.data, email=form.email.data, password=hashed_password, role='user')
         db.session.add(user)
         db.session.commit()
+        # msg = Message('Welcome to Firmware Wizard', sender='Prashant Pokhriyal', recipients=[user.email])
+        # msg.body = 'Thank you for registering with Firmware Wizard. We hope you enjoy our service.'
+        # mail.send(msg)
         flash('User added successfully!', 'success')
         return redirect(url_for('admin.home'))
     return render_template('admin/add_new_user.html', title='Admin | Add User', form=form)
