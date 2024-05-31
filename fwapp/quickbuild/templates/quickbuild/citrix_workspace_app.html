@@ -16,7 +16,7 @@
                     </h4>
                 </div>
                 <div class="card-body pt-0">
-                    <form method="post" action="" class="mt-3 form-horizontal" id="buildForm">
+                    <form method="post" action="" enctype="multipart/form-data" class="mt-3 form-horizontal" id="buildForm">
                         {{ form.hidden_tag() }}
                         <div class="row mb-3">
                             <label for="inputEmail3" class="col-3 col-form-label">Client</label>
@@ -32,15 +32,15 @@
                             </div>
                         </div>
                         <div class="row mb-3">
-                            <label for="inputPassword3" class="col-3 col-form-label">ICAClient URL</label>
+                            <label for="inputPassword3" class="col-3 col-form-label">ICAClient</label>
                             <div class="col-9">
-                                {{form.icaclient_url(class="form-control", id=sourceurl)}}
+                                {{form.icaclient(class="form-control", id=sourceurl)}}
                             </div>
                         </div>
                         <div class="row mb-3">
-                            <label for="inputPassword3" class="col-3 col-form-label">CTXUSB URL</label>
+                            <label for="inputPassword3" class="col-3 col-form-label">CTXUSB</label>
                             <div class="col-9">
-                                {{form.ctxusb_url(class="form-control", id=sourceurl)}}
+                                {{form.ctxusb(class="form-control", id=sourceurl)}}
                                 <p>
                                     <small>Please copy the download URL for <a href="https://www.citrix.com/downloads/workspace-app/linux/workspace-app-for-linux-latest.html" target="_blank">ICAClient & CTXUSB</a></small>
                                 </p>
@@ -89,7 +89,7 @@
                         
                     </div>
                     <div>
-                        <img src="{{url_for('static', filename='images/vmware.svg')}}" alt="Build in progress" width="180" height="180">
+                        <img src="{{url_for('static', filename='images/citrix.png')}}" alt="Build in progress" width="200" height="200">
                     </div>
                 </div>
             </div>

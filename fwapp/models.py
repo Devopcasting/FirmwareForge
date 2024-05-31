@@ -14,6 +14,7 @@ class User(db.Model, UserMixin):
     image_file = db.Column(db.String(20), nullable=False, default='default.png')
     role = db.Column(db.String(20), nullable=False, default='user')
     active = db.Column(db.Boolean(), default=True)
+    two_factor_enabled = db.Column(db.Boolean(), default=False)
     # Create one to many relationship with Firmware
     firmware = db.relationship('QuickBuildFirmware', backref='user', lazy=True)
     

@@ -1,34 +1,47 @@
 from flask import Blueprint, render_template, request, redirect, flash, url_for, abort
-from fwapp import db, login_manager
+from fwapp import db, app
 from flask_login import current_user, login_required
 from fwapp.models import User, QuickBuildFirmware
+from werkzeug.utils import secure_filename
 from fwapp.quickbuild.form import QuickFirmwareBuildFirefoxForm, QuickFirmwareBuildChromeForm, QuickFirmwareBuildVmwareHorizonForm, QuickFirmwareBuildCitrixWorkspaceAppForm
 import os
 import random
 import subprocess
+import shutil
+from werkzeug.utils import secure_filename
 
 # Blueprint Object
 quickbuild_route = Blueprint('quickbuild', __name__, template_folder='templates')
 
-# Firefox Patch Build path
+# Firefox patch build path
 FIREFOX_BUILD_PATH = os.path.abspath(os.path.join(os.path.join("fwapp", "static", "firefox_build")))
-# Firefox Patch Build Script
+# Firefox Failed build path
+FIREFOX_FAILED_BUILD_PATH = os.path.abspath(os.path.join(os.path.join("fwapp", "static", "firefox_build", "failed_build")))
+# Firefox patch build script
 FIREFOX_BUILD_SCRIPT = os.path.abspath(os.path.join(os.path.join("fwapp", "static", "firefox_build", "firefox_build.sh")))
 
 # Chrome Patch Build path
 CHROME_BUILD_PATH = os.path.abspath(os.path.join(os.path.join("fwapp", "static", "chrome_build")))
+# Chrome Failed build path
+CHROME_FAILED_BUILD_PATH = os.path.abspath(os.path.join(os.path.join("fwapp", "static", "chrome_build", "failed_build")))
 # Chrome Patch Build Script
 CHROME_BUILD_SCRIPT = os.path.abspath(os.path.join(os.path.join("fwapp", "static", "chrome_build", "chrome_build.sh")))
 
 # Vmware Patch Build path
 VMWARE_BUILD_PATH = os.path.abspath(os.path.join(os.path.join("fwapp", "static", "vmware_build")))
+# Vmware Failed build path
+VMWARE_FAILED_BUILD_PATH = os.path.abspath(os.path.join(os.path.join("fwapp", "static", "vmware_build", "failed_build")))
 # Vmware Patch Build Script
 VMWARE_BUILD_SCRIPT = os.path.abspath(os.path.join(os.path.join("fwapp", "static", "vmware_build", "vmware_build.sh")))
 
 # Citrix Workspace App Patch Build path
 CITRIX_BUILD_PATH = os.path.abspath(os.path.join(os.path.join("fwapp", "static", "citrix_build")))
+# Citrix Workspace App Failed build path
+CITRIX_FAILED_BUILD_PATH = os.path.abspath(os.path.join(os.path.join("fwapp", "static", "citrix_build", "failed_build")))
 # Citrix Workspace App Patch Build Script
 CITRIX_BUILD_SCRIPT = os.path.abspath(os.path.join(os.path.join("fwapp", "static", "citrix_build", "citrix_build.sh")))
+app.config['UPLOAD_FOLDER'] = CITRIX_BUILD_PATH
+
 
 # Get the size of patch
 def get_file_size(file_path) -> str:
@@ -116,8 +129,13 @@ def firefox():
             flash('Build Successful', 'success')
             return redirect(url_for('quickbuild.home'))
         else:
-            flash('Error: Build Failed', 'danger')
-            return redirect(url_for('quickbuild.home'))
+            # Move the build.log file to the failed_build folder
+            os.rename(log_file_path, f"{FIREFOX_FAILED_BUILD_PATH}/{build_id}.log")
+            # Delete the build id folder
+            shutil.rmtree(os.path.join(FIREFOX_BUILD_PATH, str(build_id)))
+            # View build error log
+            flash(f"Build Failed", 'danger')
+            return redirect (url_for('quickbuild.error', id=build_id))
     return render_template('quickbuild/firefox.html', title="User | Firefox Quick Firmware Build", form=form)
 
 # Build Google Chrome
@@ -167,8 +185,13 @@ def chrome():
             flash('Build Successful', 'success')
             return redirect(url_for('quickbuild.home'))
         else:
-            flash('Error: Build Failed', 'danger')
-            return redirect(url_for('quickbuild.home'))
+            # Move the build.log file to the failed_build folder
+            os.rename(log_file_path, f"{CHROME_FAILED_BUILD_PATH}/{build_id}.log")
+            # Delete the build id folder
+            shutil.rmtree(os.path.join(CHROME_BUILD_PATH, str(build_id)))
+            # View build error log
+            flash(f"Build Failed", 'danger')
+            return redirect (url_for('quickbuild.error', id=build_id))
     return render_template('quickbuild/google_chrome.html', title="User | Google Chrome Quick Firmware Build", form=form)
 
 # Build VMware Horizon Client
@@ -178,13 +201,13 @@ def vmware_horizon():
     log_content = None
     form = QuickFirmwareBuildVmwareHorizonForm()
     if form.validate_on_submit():
-        # Create random folder in chrome_build path
+        # Create random folder in vmware_build path
         build_id = create_random_folder(VMWARE_BUILD_PATH)
         
         # Build Log Path
         build_log_path = os.path.join(VMWARE_BUILD_PATH, str(build_id), 'build.log')
         
-        # Run the chrome_build.sh script
+        # Run the vmware_build.sh script
         try:
             status = subprocess.run(['bash', f"{VMWARE_BUILD_SCRIPT}", str(VMWARE_BUILD_PATH), str(build_id),str(form.source_url.data), str(build_log_path)], capture_output=True)
         except subprocess.CalledProcessError as e:
@@ -217,8 +240,13 @@ def vmware_horizon():
             flash('Build Successful', 'success')
             return redirect(url_for('quickbuild.home'))
         else:
-            flash('Error: Build Failed', 'danger')
-            return redirect(url_for('quickbuild.home'))
+            # Move the build.log file to the failed_build folder
+            os.rename(log_file_path, f"{VMWARE_FAILED_BUILD_PATH}/{build_id}.log")
+            # Delete the build id folder
+            shutil.rmtree(os.path.join(VMWARE_BUILD_PATH, str(build_id)))
+            # View build error log
+            flash(f"Build Failed", 'danger')
+            return redirect (url_for('quickbuild.error', id=build_id))
     return render_template('quickbuild/vmware_horizon.html', title="User | VMware Horizon Quick Firmware Build", form=form)
 
 # Build Citrix Workspace App
@@ -227,6 +255,40 @@ def vmware_horizon():
 def citrix_workspace_app():
     log_content = None
     form = QuickFirmwareBuildCitrixWorkspaceAppForm()
+    if form.validate_on_submit():
+        # Get the icaclient file
+        icaclient_file = request.files['icaclient']
+        # Get the icaclient file name
+        icaclient_file_name = secure_filename(icaclient_file.filename)
+        # ICAClient file path
+        icaclient_file_path = os.path.join(app.config['UPLOAD_FOLDER'], icaclient_file_name)
+
+        # Get the ctxusb file
+        ctxusb_file = request.files['ctxusb']
+        # Get the ctxusb file name
+        ctxusb_file_name = secure_filename(ctxusb_file.filename)
+        # Ctxusb file path
+        ctxusb_file_path = os.path.join(app.config['UPLOAD_FOLDER'], ctxusb_file_name)
+
+        # Save the icaclient and ctxusb file to the upload folder
+        if icaclient_file and ctxusb_file:
+            # Save the icaclient and ctxusb file to the upload folder
+            icaclient_file.save(icaclient_file_path)
+            ctxusb_file.save(ctxusb_file_path)
+        
+        # Create random folder in path
+        build_id = create_random_folder(CITRIX_BUILD_PATH)
+        
+        # Build Log Path
+        build_log_path = os.path.join(CITRIX_BUILD_PATH, str(build_id), 'build.log')
+
+        # Run the citrix_build.sh script
+        try:
+            status = subprocess.run(['bash', f"{CITRIX_BUILD_SCRIPT}", str(CITRIX_BUILD_PATH), str(build_id), str(build_log_path), str(icaclient_file_path), str(ctxusb_file_path)], capture_output=True)
+        except subprocess.CalledProcessError as e:
+            flash('Error: Build script execution failed', 'danger')
+            return redirect(url_for('quickbuild.home'))
+
     return render_template('quickbuild/citrix_workspace_app.html', title="User | Citrix Workspace App Quick Firmware Build", form=form)
 
 # Build Information
@@ -236,6 +298,19 @@ def info(id):
     # Get the QuickBuildFirmware object by id
     quickbuild_firmware = QuickBuildFirmware.query.get_or_404(id)
     return render_template('quickbuild/buildinfo.html', title="User | Information Quick Firmware Build", quickbuild_firmware=quickbuild_firmware)
+
+# View Error log
+@quickbuild_route.route('/quickbuild/error/<int:id>')
+@login_required
+def error(id):
+    build_id = id
+    error_log_path = os.path.join(FIREFOX_FAILED_BUILD_PATH, f"{build_id}.log")
+    error_content = None
+    # Read the content of build_id.log
+    with open(error_log_path, 'r') as file:
+        error_content = file.read()
+
+    return render_template('quickbuild/errorlog.html', title="User | Error Quick Firmware Build",buildid = build_id, error_content = error_content )
 
 # Delete Firmware. Only Current user can delete
 @quickbuild_route.route('/quickbuild/delete/<int:firmware_id>')
