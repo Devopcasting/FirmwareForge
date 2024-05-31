@@ -1,0 +1,4 @@
+#avoid display issues such as a black screen
+mks.enableGLRenderer=FALSE
+mks.enableGLBasicRenderer=FALSE
+viewusb.IncludeVidPid = "vid-0c27_pid-****;vid-147e_pid-****"

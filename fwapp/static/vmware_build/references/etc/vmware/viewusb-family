@@ -1,0 +1,15 @@
+Family		Class
+======		=====	
+audio		01
+bluetooth	e0
+comm		02
+hid		03
+imaging		06
+keyboard	03
+mouse		03
+printer		07
+video		0e
+smart-card	0b
+storage		08
+wireless	e0
+

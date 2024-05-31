@@ -1,0 +1,10 @@
+{% extends 'users/layout.html' %}
+{% block content %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{url_for('quickbuild.home')}}">Quick Firmware Build</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Enable 2-Step Authentication</li>
+        </ol>
+    </nav>
+    <img src="#" alt="Random QR Code">
+{% endblock content %}

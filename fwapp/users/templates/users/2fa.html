@@ -1,0 +1,19 @@
+{% extends 'users/layout.html' %}
+{% block content %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{url_for('quickbuild.home')}}">Quick Firmware Build</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Authentication</li>
+        </ol>
+    </nav>
+    {% if not two_factor_status %}
+        <div class="alert alert-warning" role="alert">
+            <h4 class="alert-heading">2-Step Authentication</h4>
+            <p>Your account is not protected with 2-Step Verification</p>
+            <hr>
+            <p class="mb-0">Prevent hackers from accessing your account with an additional layer of security.</p>
+            <p><a href="{{url_for('users.enable_2fa')}}">Enable 2-Step Authentication</a></p>
+        </div>
+    {% else %}
+    {% endif %}
+{% endblock content %}
