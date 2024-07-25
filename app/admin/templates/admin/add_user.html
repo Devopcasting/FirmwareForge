@@ -1,0 +1,62 @@
+{% extends 'admin/layout.html'%}
+{% block content %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{url_for('admin.admin_home')}}">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Add User</li>
+        </ol>
+    </nav>
+    <form method="post" action="">
+        {{form.hidden_tag()}}
+        <!--Username-->
+        <div class="row mb-3">
+            <label for="inputEmail3" class="col-sm-2 col-form-label">Username</label>
+            <div class="col-sm-5">
+                {% if form.username.errors %}
+                    {{form.username(class="form-control is-invalid")}}
+                    <div class="invalid-feedback">
+                        {% for error in form.username.errors %}
+                          <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{form.username(class="form-control")}}
+                {% endif %}
+            </div>
+        </div>
+        <!--Email-->
+        <div class="row mb-3">
+          <label for="inputEmail3" class="col-sm-2 col-form-label">Email</label>
+          <div class="col-sm-5">
+            {% if form.email.errors %}
+                {{form.email(class="form-control is-invalid")}}
+                <div class="invalid-feedback">
+                    {% for error in form.email.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{form.email(class="form-control")}}
+                <small  class="form-text text-muted">We'll never share your email with anyone else.</small>
+            {% endif %}
+          </div>
+        </div>
+        <!--Password-->
+        <div class="row mb-3">
+          <label for="inputPassword3" class="col-sm-2 col-form-label">Password</label>
+          <div class="col-sm-5">
+            {% if form.password.errors %}
+                {{form.password(class="form-control is-invalid")}}
+                <div class="invalid-feedback">
+                    {% for error in form.password.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{form.password(class="form-control")}}
+            {% endif %}
+          </div>
+        </div>
+        {{ form.submit(class="btn btn-primary btn-sm")}}
+    </form>
+{% endblock content %}

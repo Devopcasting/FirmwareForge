@@ -1,0 +1,128 @@
+{% extends 'users/layout.html'%}
+{% block content %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{url_for('users.users_home')}}">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Quick Firmware</li>
+        </ol>
+    </nav>
+    <div class="container">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            {% if total == 0 %}
+                <a class="btn btn-danger btn-sm me-md-2 border-0 rounded-0 disabled" href="#" role="button">Delete all builds</a>
+            {% else %}
+                <a class="btn btn-danger btn-sm me-md-2 border-0 rounded-0" href="{{url_for('quickfirmware.quickfirmware_delete_all')}}" role="button">Delete all builds</a>
+            {% endif %}
+            {% if failed_builds == 0 %}
+                <a class="btn btn-warning btn-sm border-0 rounded-0 disabled" href="#" role="button" >Delete all failed builds</a>
+            {% else %}
+                <a class="btn btn-warning btn-sm border-0 rounded-0" href="#" role="button">Delete all failed builds</a>
+            {% endif %}
+        </div>
+        <div class="row">
+            <div class="col-3">
+                <div class="card mt-5">
+                    <div class="d-flex card-header justify-content-between align-items-center">
+                        <h6 class="header-title">Quick Firmware Build Packages</h6>
+                    </div>
+                    <div class="card-body pt-0">
+                        <div class="list-group mt-3">
+                            
+                            <a href="{{url_for('quickbuild_firefox.quickbuild_firefox')}}" class="list-group-item list-group-item-action" aria-current="true">
+                                <img src="{{url_for('static', filename='images/mozilla-firefox-icon.png')}}" alt="Mozilla Firefox" width="24" height="24" class="me-2">
+                                Mozilla Firefox
+                            </a>
+                            <a href="{{url_for('quickbuild_chrome.quickbuild_chrome')}}" class="list-group-item list-group-item-action">
+                                <img src="{{url_for('static', filename='images/google-chrome-icon.png')}}" alt="Google Chrome" width="24" height="24" class="me-2">
+                                Google Chrome
+                            </a>
+                            <a href="{{url_for('quickbuild_vmware_horizon.quickbuild_vmware_horizon')}}" class="list-group-item list-group-item-action">
+                                <img src="{{url_for('static', filename='images/vmware-icon.png')}}" alt="VmwareView Horizon" width="24" height="24" class="me-2">
+                                VMware Horizon Client
+                            </a>
+                            <a href="{{url_for('quickbuild_citrix_workspace.quickbuild_citrix_workspace')}}" class="list-group-item list-group-item-action">
+                                <img src="{{url_for('static', filename='images/citrix-icon.png')}}" alt="Citrix Workspace" width="24" height="24" class="me-2">
+                                Citrix Workspace App
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-9">
+                <div class="card mt-5">
+                    <div class="d-flex card-header justify-content-between align-items-center">
+                        <h6 class="header-title">Quick Firmware Builds</h6>
+                    </div>
+                    <div class="card-body pt-0">
+                        {% if total == 0 %}
+                            <div class="alert alert-info mt-3" role="alert">
+                                No Firmware found.
+                            </div>
+                        {% else %}
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Build</th>
+                                    <th scope="col">Client</th>
+                                    <th scope="col">Patch</th>
+                                    <th scope="col">Size</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for firmware in quickfirmware %}
+                                    <tr>
+                                        <td>{{firmware.firmware_build_id}}</td>
+                                        <td>{{firmware.client_name}}</td>
+                                        <td>{{firmware.firmware_name}}</td>
+                                        <td>{{firmware.firmware_size}}</td>
+                                        <td>
+                                            {% if firmware.status == 'started' %}
+                                              <span id="spinner-{{ firmware.id }}" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                            {% elif firmware.status == 'success' %}
+                                              <span style="color: forestgreen; font-weight: bold;">{{ firmware.status }}</span>
+                                            {% elif firmware.status == 'failed' %}
+                                              <span style="color: firebrick; font-weight: bold;">{{ firmware.status }}</span>
+                                            {% endif %}
+                                          </td>
+                                        <td>
+                                            {% if firmware.status == 'started' %}
+                                                <a href="#" class="action-icon download text-decoration-none text-dark"><i class="bi bi-download"></i></a>
+                                                <a href="#" class="action-icon delete"><i class="bi bi-x-circle" style="color: firebrick;"></i></a>
+                                                <a href="#" class="action-icon info"><i class="bi bi-info-circle"></i></a>
+                                            {% elif firmware.status == 'failed' %}
+                                                <a href="#" class="action-icon download text-decoration-none text-dark"><i class="bi bi-download"></i></a>
+                                                <a href="{{url_for('quickfirmware.quickfirmware_delete', id=firmware.id)}}" class="action-icon delete"><i class="bi bi-x-circle" style="color: firebrick;"></i></a>
+                                                <a href="{{url_for('quickfirmware.quickfirmware_info', id=firmware.id)}}" class="action-icon info"><i class="bi bi-info-circle"></i></a>
+                                            {% else %}
+                                                <a href="{{firmware.firmware_download_link}}" class="action-icon download text-decoration-none text-dark" target="_blank"><i class="bi bi-download"></i></a>
+                                                <a href="{{url_for('quickfirmware.quickfirmware_delete', id=firmware.id)}}" class="action-icon delete"><i class="bi bi-x-circle" style="color: firebrick;"></i></a>
+                                                <a href="{{url_for('quickfirmware.quickfirmware_info', id=firmware.id)}}" class="action-icon info"><i class="bi bi-info-circle"></i></a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% endif %}
+                        <!--Pagination-->
+                        <div class="rounded-0 col-lg-13 mx-auto">
+                            {% for page_num in quickfirmware.iter_pages(left_edge=1,right_edge=1,left_current=1,right_current=2) %}
+                              {% if page_num %}
+                                {% if quickfirmware.page == page_num %}
+                                  <a class="btn btn-secondary btn-sm mb-4 mt-2" href="{{ url_for('quickfirmware.quickfirmware',page=page_num)}}">{{ page_num }}</a>
+                                {% else %}
+                                  <a class="btn btn-secondary btn-sm mb-4 mt-2" href="{{ url_for('quickfirmware.quickfirmware',page=page_num)}}">{{ page_num }}</a>
+                                {% endif %}  
+                              {% else %}
+                                ...
+                              {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
