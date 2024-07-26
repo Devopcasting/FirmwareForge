@@ -5,6 +5,7 @@ from app import db
 from app.quickbuild_firefox.routes import FIREFOX_BUILD_PATH
 from app.quickbuild_chrome.routes import CHROME_BUILD_PATH
 from app.quickbuild_vmware_horizon.routes import VMWARE_HORIZON_BUILD_PATH
+from app.quickbuild_citrix_workspace.routes import CITRIX_WORKSPACE_BUILD_PATH
 import subprocess
 import os
 
@@ -80,6 +81,12 @@ def quickfirmware_delete_all():
                 build_folder = os.path.join(VMWARE_HORIZON_BUILD_PATH, str(build.firmware_build_id))
                 subprocess.run(['rm', '-rf', build_folder], check=True)
             
+            # Delete the build folder inside citrix
+            # Check if locked named file is not available in build_id folder
+            if not os.path.exists(os.path.join(CITRIX_WORKSPACE_BUILD_PATH, str(build.firmware_build_id), 'locked')):
+                build_folder = os.path.join(CITRIX_WORKSPACE_BUILD_PATH, str(build.firmware_build_id))
+                subprocess.run(['rm', '-rf', build_folder], check=True)
+                
             # Delete the patch from download folder path
             download_path = os.path.join(PATCH_DOWNLOAD_FOLDER, str(build.firmware_build_id))
             subprocess.run(['rm', '-rf', download_path], check=True)
@@ -88,6 +95,46 @@ def quickfirmware_delete_all():
         QuickFirmwareBuild.query.filter_by(user_id=current_user.id).delete()
         db.session.commit()
         flash('All builds deleted successfully', 'success')
+        return redirect(url_for('quickfirmware.quickfirmware'))
+    except Exception as e:
+        flash('Error deleting builds: ' + str(e), 'danger')
+        return redirect(url_for('quickfirmware.quickfirmware'))
+
+# Delete builds which have failed status
+@quickfirmware_route.route('/quickfirmware/delete_failed', methods=['POST', 'GET'])
+@login_required
+def quickfirmware_delete_failed():
+    try:
+        # Get all the builds with failed status
+        builds = QuickFirmwareBuild.query.filter_by(user_id=current_user.id, status='failed').all()
+        for build in builds:
+            # Delete the build folder inside firefox
+            # Check if locked named file is not available in build_id folder
+            if not os.path.exists(os.path.join(FIREFOX_BUILD_PATH, str(build.firmware_build_id), 'locked')):
+                build_folder = os.path.join(FIREFOX_BUILD_PATH, str(build.firmware_build_id))
+                subprocess.run(['rm', '-rf', build_folder], check=True)
+
+            # Delete the build folder inside chrome
+            # Check if locked named file is not available in build_id folder
+            if not os.path.exists(os.path.join(CHROME_BUILD_PATH, str(build.firmware_build_id), 'locked')):
+                build_folder = os.path.join(CHROME_BUILD_PATH, str(build.firmware_build_id))
+                subprocess.run(['rm', '-rf', build_folder], check=True)
+
+            # Delete the build folder inside vmware
+            # Check if locked named file is not available in build_id folder
+            if not os.path.exists(os.path.join(VMWARE_HORIZON_BUILD_PATH, str(build.firmware_build_id), 'locked')):
+                build_folder = os.path.join(VMWARE_HORIZON_BUILD_PATH, str(build.firmware_build_id))
+                subprocess.run(['rm', '-rf', build_folder], check=True)
+            
+            # Delete the build folder inside citrix
+            # Check if locked named file is not available in build_id folder
+            if not os.path.exists(os.path.join(CITRIX_WORKSPACE_BUILD_PATH, str(build.firmware_build_id), 'locked')):
+                build_folder = os.path.join(CITRIX_WORKSPACE_BUILD_PATH, str(build.firmware_build_id))
+                subprocess.run(['rm', '-rf', build_folder], check=True)
+        # Delete all the builds with failed status
+        QuickFirmwareBuild.query.filter_by(user_id=current_user.id, status='failed').delete()
+        db.session.commit()
+        flash('Failed builds deleted successfully', 'success')
         return redirect(url_for('quickfirmware.quickfirmware'))
     except Exception as e:
         flash('Error deleting builds: ' + str(e), 'danger')

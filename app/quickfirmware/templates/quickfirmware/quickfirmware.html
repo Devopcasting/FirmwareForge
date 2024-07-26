@@ -8,15 +8,18 @@
     </nav>
     <div class="container">
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-            {% if total == 0 %}
+            <!-- {% if total == 0 %}
                 <a class="btn btn-danger btn-sm me-md-2 border-0 rounded-0 disabled" href="#" role="button">Delete all builds</a>
             {% else %}
                 <a class="btn btn-danger btn-sm me-md-2 border-0 rounded-0" href="{{url_for('quickfirmware.quickfirmware_delete_all')}}" role="button">Delete all builds</a>
-            {% endif %}
+            {% endif %} -->
+            <button class="btn btn-primary btn-sm border-0 rounded-0" onclick="location.reload();">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
             {% if failed_builds == 0 %}
-                <a class="btn btn-warning btn-sm border-0 rounded-0 disabled" href="#" role="button" >Delete all failed builds</a>
+                <a class="btn btn-danger btn-sm border-0 rounded-0 disabled" href="{{url_for('quickfirmware.quickfirmware_delete_failed')}}" role="button" >Delete all failed builds</a>
             {% else %}
-                <a class="btn btn-warning btn-sm border-0 rounded-0" href="#" role="button">Delete all failed builds</a>
+                <a class="btn btn-danger btn-sm border-0 rounded-0" href="{{url_for('quickfirmware.quickfirmware_delete_failed')}}" role="button">Delete all failed builds</a>
             {% endif %}
         </div>
         <div class="row">
@@ -62,7 +65,7 @@
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                    <th scope="col">Build</th>
+                                    <th scope="col">#</th>
                                     <th scope="col">Client</th>
                                     <th scope="col">Patch</th>
                                     <th scope="col">Size</th>
@@ -73,7 +76,7 @@
                             <tbody>
                                 {% for firmware in quickfirmware %}
                                     <tr>
-                                        <td>{{firmware.firmware_build_id}}</td>
+                                        <td>{{firmware.md5sum}}</td>
                                         <td>{{firmware.client_name}}</td>
                                         <td>{{firmware.firmware_name}}</td>
                                         <td>{{firmware.firmware_size}}</td>
@@ -89,15 +92,15 @@
                                         <td>
                                             {% if firmware.status == 'started' %}
                                                 <a href="#" class="action-icon download text-decoration-none text-dark"><i class="bi bi-download"></i></a>
-                                                <a href="#" class="action-icon delete"><i class="bi bi-x-circle" style="color: firebrick;"></i></a>
+                                                <!-- <a href="#" class="action-icon delete"><i class="bi bi-x-circle" style="color: firebrick;"></i></a> -->
                                                 <a href="#" class="action-icon info"><i class="bi bi-info-circle"></i></a>
                                             {% elif firmware.status == 'failed' %}
                                                 <a href="#" class="action-icon download text-decoration-none text-dark"><i class="bi bi-download"></i></a>
-                                                <a href="{{url_for('quickfirmware.quickfirmware_delete', id=firmware.id)}}" class="action-icon delete"><i class="bi bi-x-circle" style="color: firebrick;"></i></a>
+                                                <!-- <a href="{{url_for('quickfirmware.quickfirmware_delete', id=firmware.id)}}" class="action-icon delete"><i class="bi bi-x-circle" style="color: firebrick;"></i></a> -->
                                                 <a href="{{url_for('quickfirmware.quickfirmware_info', id=firmware.id)}}" class="action-icon info"><i class="bi bi-info-circle"></i></a>
                                             {% else %}
                                                 <a href="{{firmware.firmware_download_link}}" class="action-icon download text-decoration-none text-dark" target="_blank"><i class="bi bi-download"></i></a>
-                                                <a href="{{url_for('quickfirmware.quickfirmware_delete', id=firmware.id)}}" class="action-icon delete"><i class="bi bi-x-circle" style="color: firebrick;"></i></a>
+                                                <!-- <a href="{{url_for('quickfirmware.quickfirmware_delete', id=firmware.id)}}" class="action-icon delete"><i class="bi bi-x-circle" style="color: firebrick;"></i></a> -->
                                                 <a href="{{url_for('quickfirmware.quickfirmware_info', id=firmware.id)}}" class="action-icon info"><i class="bi bi-info-circle"></i></a>
                                             {% endif %}
                                         </td>

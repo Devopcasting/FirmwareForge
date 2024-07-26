@@ -7,9 +7,9 @@ from app.quickbuild_vmware_horizon.forms import QuickFirmwareBuildVmwareHorizonF
 import os
 import subprocess
 import random
-import shutil
+import hashlib
 import multiprocessing
-from time import sleep
+
 
 # Blueprint for the quickbuild_vmware_horizon routes
 quickbuild_vmware_horizon_route = Blueprint('quickbuild_vmware_horizon', __name__, template_folder="templates")
@@ -35,7 +35,7 @@ def quickbuild_vmware_horizon():
         client_name = form.client_name.data[0].upper() + form.client_name.data[1:].lower()
         description = form.description.data
         # Create new build entry
-        new_build = QuickFirmwareBuild(client_name=client_name,firmware_name="NA",firmware_build_id=build_id, firmware_description=description, firmware_size="NA",firmware_log="NA", download_link="NA", user_id=current_user.id)
+        new_build = QuickFirmwareBuild(client_name=client_name,firmware_name="NA",firmware_build_id=build_id, firmware_description=description, firmware_size="NA",firmware_log="NA", download_link="NA", md5sum="NA", user_id=current_user.id)
         db.session.add(new_build)
         db.session.commit()
         # Start the build process in the background
@@ -71,6 +71,15 @@ def get_ip_address():
     ip_address = ip_address.decode('utf-8').strip()
     return ip_address
 
+# Calculate the MD5SUM of the firmware
+def calculate_md5sum(file_path) -> str:
+    hash_md5 = hashlib.md5()
+    with open(file_path, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_md5.update(chunk)
+    # Return only last 4 characters of md5sum
+    return hash_md5.hexdigest()[-4:].upper()
+
 # Start the build process
 def start_build(log_path, user_id, build_id, source_url):
     build = QuickFirmwareBuild.query.get(user_id)
@@ -101,12 +110,16 @@ def start_build(log_path, user_id, build_id, source_url):
             # Get the IP address
             ip_address = get_ip_address()
 
+            # Get the MD5SUM
+            md5sum = calculate_md5sum(os.path.join(VMWARE_HORIZON_BUILD_PATH, str(build_id), patch_name + ".tar.bz2"))
+
             # Save the patch info in db
             build.firmware_name = patch_name
             build.firmware_size = patch_size
             build.firmware_log = log_content
             build.download_link = f"http://{ip_address}/{build_id}/{patch_name}.tar.bz2"
             build.status = 'success'
+            build.md5sum = md5sum
         else:
             build.status = 'failed' 
     except Exception as e:
