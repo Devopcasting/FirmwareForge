@@ -36,6 +36,7 @@ class QuickFirmwareBuild(db.Model):
     firmware_log = db.Column(db.Text, nullable=False)
     download_link = db.Column(db.String(200), nullable=False)
     build_date = db.Column(db.DateTime, nullable=False, default=datetime.now)
-    status = db.Column(db.String(20), nullable=False, default='started') 
+    status = db.Column(db.String(20), nullable=False, default='started')
+    md5sum = db.Column(db.String(32), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     
