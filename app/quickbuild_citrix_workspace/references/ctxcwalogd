@@ -1,0 +1,83 @@
+#!/bin/sh
+# Copyright 2020 Citrix Systems, Inc.
+#
+# This script starts and stops Citrix Logging Service
+
+# The settings for chkconfig:
+# chkconfig is used on Redhat and Fedora instead of update-rc.d to update init levels
+# the default values of 20 and 80 are being used for start and stop priority.
+# chkconfig <run levels> <start priority> <stop priority>
+# chkconfig: 2345 20 80
+# description: Provides Logging service required for the Workspace App for Linux.
+
+### LSB init script information required by debian
+### BEGIN INIT INFO
+# Provides:          ctxcwalogd
+# Required-Start:
+# Required-Stop:     
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Citrix Logging Service
+### END INIT INFO
+
+# Set a sane path
+export PATH=/bin:/usr/bin:/usr/sbin:/sbin
+
+# The DAEMON variable gets updated at install time if it is not installed in the default location
+DAEMON=/opt/Citrix/ICAClient/util/ctxcwalogd
+CitrixUser=citrixlog
+RUNDIR=/var/run/ctxcwalogd
+PIDFILE=$RUNDIR/ctxcwalogd.pid
+
+ECHO_CMD_NO_NL=printf
+
+INITLIB="NOT_FOUND"
+
+CTXLOGD_PID=""
+
+
+
+ctxcwalogd_start () {
+	# Check if the daemon is already running
+	CTXLOGD_PID=$(pgrep -f ctxcwalogd)
+	# If the daemon is not running
+	if [ -z "$CTXLOGD_PID" ]
+	then
+		mkdir -m 700 -p "$RUNDIR"
+		echo " * Starting Citrix Log daemon"
+		"$DAEMON"
+	else
+		echo "Citrix Log daemon is already running"
+	fi
+}
+ctxcwalogd_stop () {
+	# Check if the daemon is already running
+	CTXLOGD_PID=$(pgrep -f ctxcwalogd)
+	# If a pid has been found
+	if [ -n "$CTXLOGD_PID" ]
+	then
+		# Stop the ctxcwalogd daemon manually
+		echo "* Stopping Citrix Log daemon"
+		kill -9 $CTXLOGD_PID
+	fi
+}
+
+# parse arguments
+case "$1" in
+    start|stop)
+        ctxcwalogd_${1}
+        ;;
+
+    restart|reload|force-reload)
+        ctxcwalogd_stop
+        ctxcwalogd_start
+        ;;
+
+    *)
+        echo "usage: `basename "$0"` { start | stop | restart | reload | force-reload }" >&2
+        exit 1
+        ;;
+esac
+
+exit 0
+

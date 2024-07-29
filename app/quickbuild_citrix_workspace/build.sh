@@ -92,6 +92,7 @@ ln -s ../nls/en/wfclient.template wfclient.template
 cd "$CITRIX_BUILD_PATH/$BUILD_ID/002-Citrix-Workspace-$ICACLIENT_VERSION"
 cd opt/Citrix/ICAClient
 cp  $REFERENCE_PATH/usb.conf .
+rm -rf opt/Citrix/ICAClient/DeepFilter*
 
 cd "$CITRIX_BUILD_PATH/$BUILD_ID/002-Citrix-Workspace-$ICACLIENT_VERSION"
 cd opt/Citrix/ICAClient
@@ -100,6 +101,18 @@ NEW_ID_VERSION=$ICACLIENT_VERSION
 NEW_DISP_VERSION=$(echo $NEW_ID_VERSION | cut -d'.' -f1-3)
 sed -i "s/^ID_VERSION=.*/ID_VERSION=$NEW_ID_VERSION/" $REFERENCE_PATH/pkginf/Ver.core.linuxx64
 sed -i "s/^DISP_VERSION=.*/DISP_VERSION=$NEW_DISP_VERSION/" $REFERENCE_PATH/pkginf/Ver.core.linuxx64
+
+cd "$CITRIX_BUILD_PATH/$BUILD_ID/002-Citrix-Workspace-$ICACLIENT_VERSION"
+mkdir etc/rc.d
+mv etc/init.d etc/rc.d/
+cp $REFERENCE_PATH/ctxcwalogd etc/rc.d/init.d/
+cd etc/rc.d
+mkdir rc5.d
+cd rc5.d
+ln -s /etc/rc.d/init.d/ctxcwalogd K08ctxcwalogd
+ln -s /etc/rc.d/init.d/ctxusbd K08ctxusbd
+ln -s /etc/rc.d/init.d/ctxcwalogd S50ctxcwalogd
+ln -s /etc/rc.d/init.d/ctxusbd S50ctxusbd
 check_command "Refactoring package contents"
 
 # Update the INI files
@@ -136,7 +149,12 @@ check_command "Creating SquashFS file"
 log_message "Creating Install script"
 cat <<EOF > "$CITRIX_BUILD_PATH/$BUILD_ID/root/install.sh"
 #!/bin/bash
-pids=\$(pgrep -f ctxusb)
+pids=\$(pgrep -f ctxusbd)
+for pid in \$pids; do
+    kill \$pid
+done
+
+pids=\$(pgrep -f ctxcwalogd)
 for pid in \$pids; do
     kill \$pid
 done

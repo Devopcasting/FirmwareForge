@@ -38,6 +38,7 @@
                                         <td class="table-action">
                                             <a href="{{url_for('admin.edit_user', user_id=user.id)}}"><i class="bi bi-pencil-fill" style="color: chocolate;"></i></a>
                                             <a href="{{url_for('admin.delete_user', user_id=user.id)}}" class="ms-2"><i class="bi bi-person-x-fill" style="color: red;"></i></a>
+                                            <a href="{{url_for('admin.patch_info', user_id=user.id)}}" class="action-icon info ms-2"><i class="bi bi-info-circle"></i></a>
                                         </td>
                                     </tr>
                                 {% endfor %}

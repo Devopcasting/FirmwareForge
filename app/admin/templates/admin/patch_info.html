@@ -1,0 +1,65 @@
+{% extends 'admin/layout.html'%}
+{% block content %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{url_for('admin.admin_home')}}">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Patch Dashboard</li>
+        </ol>
+    </nav>
+    <div class="row">
+        <div class="col">
+            <div class="card mt-5">
+                <div class="d-flex card-header justify-content-between align-items-center">
+                    <h5 class="header-title">
+                        <img src="{{url_for('static', filename='images/google-chrome-icon.png')}}" alt="Google Chrome" width="24" height="24" class="me-2">
+                        Quick Firmwares
+                    </h5>
+                </div>
+                <div class="card-body pt-0">
+                    {% if total_quick_patch == 0 %}
+                        <div class="alert alert-info mt-3" role="alert">
+                            No Firmware found.
+                        </div>
+                    {% else %}
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Client</th>
+                                    <th scope="col">Patch</th>
+                                    <th scope="col">Size</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for firmware in quickpatch %}
+                                    <tr>
+                                        <td>{{firmware.md5sum}}</td>
+                                        <td>{{firmware.client_name}}</td>
+                                        <td>{{firmware.firmware_name}}</td>
+                                        <td>{{firmware.firmware_size}}</td>
+                                        <td>
+                                            <a href="{{url_for('admin.quickfirmware_delete', id=firmware.id)}}" class="action-icon delete"><i class="bi bi-x-circle" style="color: firebrick;"></i></a>
+                                            <a href="#" class="action-icon info ms-2"><i class="bi bi-info-circle"></i></a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card mt-5">
+                <div class="d-flex card-header justify-content-between align-items-center">
+                    <h5 class="header-title">
+                        <img src="{{url_for('static', filename='images/google-chrome-icon.png')}}" alt="Google Chrome" width="24" height="24" class="me-2">
+                        Firmwares
+                    </h5>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+{% endblock content %}

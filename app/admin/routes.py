@@ -4,6 +4,12 @@ from app import db, bcrypt
 from app.admin.forms import AddUserForm, EditUserForm
 from app.models import User,QuickFirmwareBuild
 from functools import wraps
+import subprocess
+import os
+from app.quickbuild_firefox.routes import FIREFOX_BUILD_PATH
+from app.quickbuild_chrome.routes import CHROME_BUILD_PATH
+from app.quickbuild_vmware_horizon.routes import VMWARE_HORIZON_BUILD_PATH
+from app.quickbuild_citrix_workspace.routes import CITRIX_WORKSPACE_BUILD_PATH
 
 # Blueprint for the admin routes
 admin_route = Blueprint('admin', __name__, template_folder="templates")
@@ -79,6 +85,51 @@ def edit_user(user_id):
         form.email.data = user.email
         form.is_active.data = user.active
     return render_template('admin/edit_user.html', title="Edit User", form=form)
+
+# Information Patch created by user
+@admin_route.route('/admin/patch-info/<int:user_id>', methods=['GET', 'POST'])
+@login_required
+@admin_role_required
+def patch_info(user_id):
+    page = request.args.get('page', 1, type=int)
+    # Count total quick patch
+    total_quick_patch = QuickFirmwareBuild.query.filter_by(user_id=user_id, status='success').count()
+    quick_patch = QuickFirmwareBuild.query.filter_by(user_id=user_id, status='success').paginate(page=page, per_page=5)
+    return render_template('admin/patch_info.html', title="Patch Info", quickpatch=quick_patch, total_quick_patch=total_quick_patch)
+
+# Delete Build
+@admin_route.route('/admin/delete/<int:id>')
+@login_required
+@admin_role_required
+def quickfirmware_delete(id):
+    quickfirmware = QuickFirmwareBuild.query.get_or_404(id)
+    try:
+        # Check if build id is available in FIREFOX_BUILD_PATH
+        build_folder = os.path.join(FIREFOX_BUILD_PATH, str(quickfirmware.firmware_build_id))
+        if os.path.exists(build_folder):
+            subprocess.run(['rm', '-rf', build_folder], check=True)
+        # Check if build id is available in CHROME_BUILD_PATH
+        build_folder = os.path.join(CHROME_BUILD_PATH, str(quickfirmware.firmware_build_id))
+        if os.path.exists(build_folder):
+            subprocess.run(['rm', '-rf', build_folder], check=True)
+        # Check if build id is available in VMWARE_HORIZON_BUILD_PATH
+        build_folder = os.path.join(VMWARE_HORIZON_BUILD_PATH, str(quickfirmware.firmware_build_id))
+        if os.path.exists(build_folder):
+            subprocess.run(['rm', '-rf', build_folder], check=True)
+        # Check if build id is available in CITRIX_WORKSPACE_BUILD_PATH
+        build_folder = os.path.join(CITRIX_WORKSPACE_BUILD_PATH, str(quickfirmware.firmware_build_id))
+        if os.path.exists(build_folder):
+            subprocess.run(['rm', '-rf', build_folder], check=True)
+        
+        # Update the Database
+        db.session.delete(quickfirmware)
+        db.session.commit()
+        flash('Build deleted successfully', 'success')
+        return redirect(url_for('admin.admin_home'))
+
+    except Exception as e:
+        flash('Error deleting build: ' + str(e), 'danger')
+        return redirect(url_for('admin.admin_home'))
 
 @admin_route.route('/logout')
 @login_required
