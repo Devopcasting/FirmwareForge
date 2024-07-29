@@ -35,6 +35,13 @@ def quickfirmware_info(id):
     quickfirmware = QuickFirmwareBuild.query.get_or_404(id)
     return render_template('quickfirmware/quickfirmware_info.html', title="Build Info", quickfirmware=quickfirmware)
 
+# QuickBuild Failed Log
+@quickfirmware_route.route('/quickfirmware/failed_log/<int:id>')
+@login_required
+def quickfirmware_failed_log(id):
+    quickfirmware = QuickFirmwareBuild.query.get_or_404(id)
+    return render_template('quickfirmware/quickfirmware_failed_log.html', title="Failed Log", quickfirmware=quickfirmware)
+
 # Delete Build
 @quickfirmware_route.route('/quickfirmware/delete/<int:id>')
 @login_required
@@ -109,28 +116,26 @@ def quickfirmware_delete_failed():
         builds = QuickFirmwareBuild.query.filter_by(user_id=current_user.id, status='failed').all()
         for build in builds:
             # Delete the build folder inside firefox
-            # Check if locked named file is not available in build_id folder
-            if not os.path.exists(os.path.join(FIREFOX_BUILD_PATH, str(build.firmware_build_id), 'locked')):
-                build_folder = os.path.join(FIREFOX_BUILD_PATH, str(build.firmware_build_id))
+            build_folder = os.path.join(FIREFOX_BUILD_PATH, str(build.firmware_build_id))
+            if os.path.exists(build_folder):
                 subprocess.run(['rm', '-rf', build_folder], check=True)
 
             # Delete the build folder inside chrome
-            # Check if locked named file is not available in build_id folder
-            if not os.path.exists(os.path.join(CHROME_BUILD_PATH, str(build.firmware_build_id), 'locked')):
-                build_folder = os.path.join(CHROME_BUILD_PATH, str(build.firmware_build_id))
+            build_folder = os.path.join(CHROME_BUILD_PATH, str(build.firmware_build_id))
+            if os.path.exists(build_folder):
                 subprocess.run(['rm', '-rf', build_folder], check=True)
+            
 
             # Delete the build folder inside vmware
-            # Check if locked named file is not available in build_id folder
-            if not os.path.exists(os.path.join(VMWARE_HORIZON_BUILD_PATH, str(build.firmware_build_id), 'locked')):
-                build_folder = os.path.join(VMWARE_HORIZON_BUILD_PATH, str(build.firmware_build_id))
+            build_folder = os.path.join(VMWARE_HORIZON_BUILD_PATH, str(build.firmware_build_id))
+            if os.path.exists(build_folder):
                 subprocess.run(['rm', '-rf', build_folder], check=True)
             
             # Delete the build folder inside citrix
-            # Check if locked named file is not available in build_id folder
-            if not os.path.exists(os.path.join(CITRIX_WORKSPACE_BUILD_PATH, str(build.firmware_build_id), 'locked')):
-                build_folder = os.path.join(CITRIX_WORKSPACE_BUILD_PATH, str(build.firmware_build_id))
+            build_folder = os.path.join(CITRIX_WORKSPACE_BUILD_PATH, str(build.firmware_build_id))
+            if os.path.exists(build_folder):
                 subprocess.run(['rm', '-rf', build_folder], check=True)
+                
         # Delete all the builds with failed status
         QuickFirmwareBuild.query.filter_by(user_id=current_user.id, status='failed').delete()
         db.session.commit()

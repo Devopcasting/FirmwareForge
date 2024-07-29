@@ -159,9 +159,15 @@ def start_build(log_path, user_id, build_id, icaclient_url, ctxusb_url):
             build.download_link = f"http://{ip_address}/{build_id}/{patch_name}.tar.bz2"
             build.status = 'success'
             build.md5sum = md5sum
+            # Remove all the contents inside the build except patch and log
+            for item in os.listdir(os.path.join(CITRIX_WORKSPACE_BUILD_PATH, str(build_id))):
+                if item != patch_name + ".tar.bz2" and item != "build.log":
+                    subprocess.run(['rm', '-rf', os.path.join(CITRIX_WORKSPACE_BUILD_PATH, str(build_id), item)])
         else:
             build.status = 'failed' 
+            build.firmware_log = log_content
     except Exception as e:
+        build.firmware_log = log_content
         build.status = 'failed'
     finally:
         db.session.commit()

@@ -17,9 +17,9 @@
                 <i class="fas fa-sync-alt"></i> Refresh
             </button>
             {% if failed_builds == 0 %}
-                <a class="btn btn-danger btn-sm border-0 rounded-0 disabled" href="{{url_for('quickfirmware.quickfirmware_delete_failed')}}" role="button" >Delete all failed builds</a>
+                <a class="btn btn-danger btn-sm border-0 rounded-0 disabled" href="#" role="button" >Delete all failed builds</a>
             {% else %}
-                <a class="btn btn-danger btn-sm border-0 rounded-0" href="{{url_for('quickfirmware.quickfirmware_delete_failed')}}" role="button">Delete all failed builds</a>
+                <a class="btn btn-danger btn-sm border-0 rounded-0" href="{{url_for('quickfirmware.quickfirmware_delete_failed')}}" role="button">Delete all failed builds</a> 
             {% endif %}
         </div>
         <div class="row">
@@ -97,7 +97,7 @@
                                             {% elif firmware.status == 'failed' %}
                                                 <a href="#" class="action-icon download text-decoration-none text-dark"><i class="bi bi-download"></i></a>
                                                 <!-- <a href="{{url_for('quickfirmware.quickfirmware_delete', id=firmware.id)}}" class="action-icon delete"><i class="bi bi-x-circle" style="color: firebrick;"></i></a> -->
-                                                <a href="{{url_for('quickfirmware.quickfirmware_info', id=firmware.id)}}" class="action-icon info"><i class="bi bi-info-circle"></i></a>
+                                                <a href="{{url_for('quickfirmware.quickfirmware_failed_log', id=firmware.id)}}" class="action-icon info"><i class="bi bi-info-circle"></i></a>
                                             {% else %}
                                                 <a href="{{firmware.firmware_download_link}}" class="action-icon download text-decoration-none text-dark" target="_blank"><i class="bi bi-download"></i></a>
                                                 <!-- <a href="{{url_for('quickfirmware.quickfirmware_delete', id=firmware.id)}}" class="action-icon delete"><i class="bi bi-x-circle" style="color: firebrick;"></i></a> -->

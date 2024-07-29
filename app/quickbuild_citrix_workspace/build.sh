@@ -93,6 +93,13 @@ cd "$CITRIX_BUILD_PATH/$BUILD_ID/002-Citrix-Workspace-$ICACLIENT_VERSION"
 cd opt/Citrix/ICAClient
 cp  $REFERENCE_PATH/usb.conf .
 
+cd "$CITRIX_BUILD_PATH/$BUILD_ID/002-Citrix-Workspace-$ICACLIENT_VERSION"
+cd opt/Citrix/ICAClient
+cp  -pa $REFERENCE_PATH/pkginf .
+NEW_ID_VERSION=$ICACLIENT_VERSION
+NEW_DISP_VERSION=$(echo $NEW_ID_VERSION | cut -d'.' -f1-3)
+sed -i "s/^ID_VERSION=.*/ID_VERSION=$NEW_ID_VERSION/" $REFERENCE_PATH/pkginf/Ver.core.linuxx64
+sed -i "s/^DISP_VERSION=.*/DISP_VERSION=$NEW_DISP_VERSION/" $REFERENCE_PATH/pkginf/Ver.core.linuxx64
 check_command "Refactoring package contents"
 
 # Update the INI files

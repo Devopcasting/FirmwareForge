@@ -119,10 +119,16 @@ def start_build(log_path, user_id, build_id):
             build.download_link = f"http://{ip_address}/{build_id}/{patch_name}.tar.bz2"
             build.status = 'success'
             build.md5sum = patch_md5sum
+            # Remove all the contents inside the build except patch and log
+            for item in os.listdir(os.path.join(FIREFOX_BUILD_PATH, str(build_id))):
+                if item != patch_name + ".tar.bz2" and item != "build.log":
+                    subprocess.run(['rm', '-rf', os.path.join(FIREFOX_BUILD_PATH, str(build_id), item)])
         else:
-            build.status = 'failed' 
+            build.status = 'failed'
+            build.firmware_log = log_content
     except Exception as e:
         build.status = 'failed'
+        build.firmware_log = log_content
     finally:
         db.session.commit()
 

@@ -1,6 +1,6 @@
 #!/bin/bash
-set -e
-#set -x
+#set -e
+set -x
 
 # Function to log messages
 log_message() {
@@ -30,6 +30,9 @@ VMWARE_FOLDER="$VMWARE_BUILD_PATH/$BUILD_ID/vmware"
 
 log_message "Starting VWware Horizon Client build"
 log_message "-------------------------------------"
+
+# Create a locked name file in the build path
+touch "$VMWARE_BUILD_PATH/$BUILD_ID/locked"
 
 # Get the vmware bundle name
 vmware_bundle_name=$(basename "$VMWARE_SOURCE_URL")
@@ -63,19 +66,35 @@ check_command "Create Package structure"
 cd "$VMWARE_BUILD_PATH/$BUILD_ID/bundle"
 for file in *; do
     # Enter into file
+    echo "$file" &>> "$LOG_PATH"
     cd "$file"
     # Check if user folder exists
     if [ -d "usr" ]; then
-        # Copy usr folder contents to "007-vmware-view-horizon-$vmware_bundle_version/usr"
-        cp -pva usr/* ../../"007-vmware-view-horizon-$vmware_bundle_version/usr"
+        # Copy usr folder contents to "007-vmware-view-horizon-$vmware_bundle_version/usr". Redirect the verbose to log
+        cp -pva usr/* ../../"007-vmware-view-horizon-$vmware_bundle_version/usr" &>> "$LOG_PATH"
     fi
     # Check if etc folder exists
     if [ -d "etc" ]; then
         # Copy etc folder contents to "007-vmware-view-horizon-$vmware_bundle_version/etc"
-        cp -pva etc/* ../../"007-vmware-view-horizon-$vmware_bundle_version/etc"
+        cp -pva etc/* ../../"007-vmware-view-horizon-$vmware_bundle_version/etc" &>> "$LOG_PATH"
     fi
     cd ..
 done
+# Setup Vmware USB
+log_message "Setting up Vmware USB"
+cd "$VMWARE_BUILD_PATH/$BUILD_ID/007-vmware-view-horizon-$vmware_bundle_version/etc"
+rm -rf init.d/ftscan*
+rm -rf init.d/ftsprhv*
+chmod -R 755 *
+mkdir rc.d
+cd rc.d
+ln -s ../init.d .
+mkdir rc5.d
+cd rc5.d
+ln -s /etc/init.d/vmware-USBArbitrator K08vmware-USBArbitrator
+ln -s /etc/init.d/vmware-USBArbitrator S50vmware-USBArbitrator
+
+check_command "Setup Vmware USB"
 
 # Finalize the package
 log_message "Finalizing package"
@@ -153,6 +172,6 @@ sudo mkdir -p "$web_dir"
 sudo chmod 755 "$web_dir"
 sudo cp "$final_tarball" "$web_dir"
 check_command "Moving tarball to web directory"
-
 log_message "Build process completed successfully"
-
+# Remove the locked name file
+rm "$VMWARE_BUILD_PATH/$BUILD_ID/locked"
