@@ -13,9 +13,12 @@ from app.quickbuild_citrix_workspace.routes import CITRIX_WORKSPACE_BUILD_PATH
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import inch
+from reportlab.lib import colors
 from reportlab.lib.colors import black
-from reportlab.platypus import Table, TableStyle
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.enums import TA_LEFT, TA_CENTER
+
 from datetime import date
 
 # Blueprint for the admin routes
@@ -163,9 +166,10 @@ def user_report(user_id):
 
     # Check for total number of quick firmware updates
     total_quick_patch = len(quick_patch)
-    if len(quick_patch) == 0:
+    if total_quick_patch == 0:
         flash('No firmware updates found for this user', 'warning')
         return redirect(url_for('admin.admin_home'))
+
     # Create a PDF report
     pdf_file = os.path.join(PATCH_DOWNLOAD_FOLDER, f"{user.username}_report.pdf")
     c = canvas.Canvas(pdf_file, pagesize=A4)
@@ -186,52 +190,66 @@ def user_report(user_id):
     c.drawString(1*inch, 9.5*inch, "Generated on: " + current_date)
 
     # Add user information
-    c.drawString(1*inch, 9*inch, f"Username: {user.username}")
-    c.drawString(1*inch, 8.5*inch, f"Email: {user.email}")
-
-    # Add firmware update statistics
-    c.drawString(1*inch, 8*inch, "Total number of Firmware updates: " + str("NA"))
-    c.drawString(1*inch, 7.5*inch, "Total number of Quick Firmware updates: " + str("NA"))
-
-
-    # Create a table for firmware updates
-    data = [["Build Id", "Md5sum", "Patchname", "Patch size", "Build Date"]]
-    for firmware in quick_patch:
-        data.append([str(firmware.firmware_build_id), firmware.md5sum, firmware.firmware_name, str(firmware.firmware_size), str(firmware.build_date.strftime('%d-%m-%Y'))])
+    user_info = f"""
+    <b>Username:</b> {user.username}<br/>
+    <b>Email:</b> {user.email}<br/>
+    <b>Total number of Firmware updates:</b> {total_quick_patch}<br/>
+    <b>Total number of Quick Firmware updates:</b> {total_quick_patch}
+    """
+    styles = getSampleStyleSheet()
+    styles.add(ParagraphStyle(name='UserInfo', fontSize=10, leading=12, spaceAfter=10))
+    user_info_paragraph = Paragraph(user_info, styles['UserInfo'])
+    user_info_paragraph.wrapOn(c, 7.5*inch, 1*inch)
+    user_info_paragraph.drawOn(c, 1*inch, 8.2*inch)
     
     # Add heading for the table    
     c.setFont("Helvetica", 12)
-    c.drawString(1*inch, 7.2*inch, "Quick Firmware Update")
-    table = Table(data, colWidths=[1.2*inch, 1.2*inch, 2*inch, 1.2*inch, 0.8*inch])
+    c.drawString(1*inch, 7.8*inch, "Quick Firmware Update")
+
+    # Create a table for firmware updates
+    data = [["Build Id","Client","Md5sum", "Patchname", "Patch size", "Build Date"]]
+    for firmware in quick_patch:
+        client_paragraph = Paragraph(firmware.client_name, styles['Normal'])
+        patchname_paragraph = Paragraph(firmware.firmware_name, styles['Normal'])
+        data.append([
+            str(firmware.firmware_build_id),
+            client_paragraph,
+            firmware.md5sum,
+            patchname_paragraph,
+            str(firmware.firmware_size),
+            firmware.build_date.strftime('%d-%m-%Y')
+        ])
+    
+    table = Table(data, colWidths=[0.6*inch, 1.2*inch, 0.8*inch, 2.4*inch, 0.8*inch, 0.8*inch])
 
     table.setStyle(TableStyle([
-    ('FONTNAME', (0,0), (-1,-1), 'Helvetica'),
-    ('FONTSIZE', (0,0), (-1,-1), 8),
-    ('ALIGN', (0,0), (-1,-1), 'LEFT'),
-    ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-    ('INNERGRID', (0,0), (-1,-1), 0.25, black),
-    ('BOX', (0,0), (-1,-1), 0.25, black),
-    ('WRAP', (0,0),(-1,-1),True),]))
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 8),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+        ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('WORDWRAP', (1, 1), (-1, -1), True)
+    ]))
     
-    # Split the table across multiple pages
+    # Check if the table needs to be split across multiple pages
     table_height = table.wrapOn(c, 7*inch, 5*inch)[1]
     if table_height > 5*inch:
-        # Split the table into multiple tables
         num_pages = int(table_height / 5*inch) + 1
         for i in range(num_pages):
             table_page = table.split(num_pages, i)
-            table_page.drawOn(c, 0.5*inch, 6*inch - i*5*inch)
+            table_page.drawOn(c, 1*inch, 6.5*inch - i*5*inch)
             if i < num_pages - 1:
                 c.showPage()
     else:
-        table.drawOn(c, 0.5*inch, 6*inch)
+        table.drawOn(c, 1*inch, 6.5*inch)
 
-    # Save PDF and Display the download URL
+    # Save PDF and display the download URL
     c.save()
     report_download_link = f"http://{get_ip_address()}/{user.username}_report.pdf"
     flash(f'Report generated successfully. {report_download_link}', 'success')
     return redirect(url_for('admin.admin_home'))
-
 @admin_route.route('/logout')
 @login_required
 def logout():
