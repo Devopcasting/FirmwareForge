@@ -18,6 +18,7 @@ from reportlab.lib.colors import black
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.enums import TA_LEFT, TA_CENTER
+from markupsafe import Markup
 
 from datetime import date
 
@@ -248,7 +249,7 @@ def user_report(user_id):
     # Save PDF and display the download URL
     c.save()
     report_download_link = f"http://{get_ip_address()}/{user.username}_report.pdf"
-    flash(f'Report generated successfully. {report_download_link}', 'success')
+    flash(Markup(f'Report generated successfully. <a href="{report_download_link}" target="_blank">Download it here</a>'), 'success')
     return redirect(url_for('admin.admin_home'))
 @admin_route.route('/logout')
 @login_required
