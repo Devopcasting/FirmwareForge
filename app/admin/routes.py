@@ -10,9 +10,19 @@ from app.quickbuild_firefox.routes import FIREFOX_BUILD_PATH
 from app.quickbuild_chrome.routes import CHROME_BUILD_PATH
 from app.quickbuild_vmware_horizon.routes import VMWARE_HORIZON_BUILD_PATH
 from app.quickbuild_citrix_workspace.routes import CITRIX_WORKSPACE_BUILD_PATH
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.units import inch
+from reportlab.lib.colors import black
+from reportlab.platypus import Table, TableStyle
+from reportlab.lib.enums import TA_LEFT, TA_CENTER
+from datetime import date
 
 # Blueprint for the admin routes
 admin_route = Blueprint('admin', __name__, template_folder="templates")
+
+# Download Folder path
+PATCH_DOWNLOAD_FOLDER = "/var/www/html/"
 
 # Admin role decorator
 def admin_role_required(func):
@@ -108,6 +118,7 @@ def quickfirmware_delete(id):
         build_folder = os.path.join(FIREFOX_BUILD_PATH, str(quickfirmware.firmware_build_id))
         if os.path.exists(build_folder):
             subprocess.run(['rm', '-rf', build_folder], check=True)
+            
         # Check if build id is available in CHROME_BUILD_PATH
         build_folder = os.path.join(CHROME_BUILD_PATH, str(quickfirmware.firmware_build_id))
         if os.path.exists(build_folder):
@@ -121,6 +132,9 @@ def quickfirmware_delete(id):
         if os.path.exists(build_folder):
             subprocess.run(['rm', '-rf', build_folder], check=True)
         
+        # Delete patch from /var/www/html
+        subprocess.run(['rm', '-rf', os.path.join(PATCH_DOWNLOAD_FOLDER, str(quickfirmware.firmware_build_id))], check=True)
+
         # Update the Database
         db.session.delete(quickfirmware)
         db.session.commit()
@@ -130,6 +144,93 @@ def quickfirmware_delete(id):
     except Exception as e:
         flash('Error deleting build: ' + str(e), 'danger')
         return redirect(url_for('admin.admin_home'))
+
+# Get the current system IP address
+def get_ip_address():
+    try:
+        ip = subprocess.check_output(['hostname', '-i']).decode().strip()
+        return ip
+    except Exception as e:
+        return "Unknown"
+    
+# Generate User firmware updates build report
+@admin_route.route('/admin/user-report/<int:user_id>')
+@login_required
+@admin_role_required
+def user_report(user_id):
+    user = User.query.get_or_404(user_id)
+    quick_patch = QuickFirmwareBuild.query.filter_by(user_id=user_id, status='success').all()
+
+    # Check for total number of quick firmware updates
+    total_quick_patch = len(quick_patch)
+    if len(quick_patch) == 0:
+        flash('No firmware updates found for this user', 'warning')
+        return redirect(url_for('admin.admin_home'))
+    # Create a PDF report
+    pdf_file = os.path.join(PATCH_DOWNLOAD_FOLDER, f"{user.username}_report.pdf")
+    c = canvas.Canvas(pdf_file, pagesize=A4)
+    
+    # Set font and font size
+    c.setFont("Helvetica", 12)
+    
+    # Add title
+    title = "Firmware Update Report"
+    title_x = (8.5*inch - c.stringWidth(title, "Helvetica", 15)) / 2
+    c.setFont("Helvetica", 15)
+    c.drawString(title_x, 10.5*inch, title)
+    c.line(1*inch, 10*inch, 8*inch, 10*inch)
+
+    # Add current date
+    current_date = date.today().strftime("%Y-%m-%d")
+    c.setFont("Helvetica", 10)
+    c.drawString(1*inch, 9.5*inch, "Generated on: " + current_date)
+
+    # Add user information
+    c.drawString(1*inch, 9*inch, f"Username: {user.username}")
+    c.drawString(1*inch, 8.5*inch, f"Email: {user.email}")
+
+    # Add firmware update statistics
+    c.drawString(1*inch, 8*inch, "Total number of Firmware updates: " + str("NA"))
+    c.drawString(1*inch, 7.5*inch, "Total number of Quick Firmware updates: " + str("NA"))
+
+
+    # Create a table for firmware updates
+    data = [["Build Id", "Md5sum", "Patchname", "Patch size", "Build Date"]]
+    for firmware in quick_patch:
+        data.append([str(firmware.firmware_build_id), firmware.md5sum, firmware.firmware_name, str(firmware.firmware_size), str(firmware.build_date.strftime('%d-%m-%Y'))])
+    
+    # Add heading for the table    
+    c.setFont("Helvetica", 12)
+    c.drawString(1*inch, 7.2*inch, "Quick Firmware Update")
+    table = Table(data, colWidths=[1.2*inch, 1.2*inch, 2*inch, 1.2*inch, 0.8*inch])
+
+    table.setStyle(TableStyle([
+    ('FONTNAME', (0,0), (-1,-1), 'Helvetica'),
+    ('FONTSIZE', (0,0), (-1,-1), 8),
+    ('ALIGN', (0,0), (-1,-1), 'LEFT'),
+    ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+    ('INNERGRID', (0,0), (-1,-1), 0.25, black),
+    ('BOX', (0,0), (-1,-1), 0.25, black),
+    ('WRAP', (0,0),(-1,-1),True),]))
+    
+    # Split the table across multiple pages
+    table_height = table.wrapOn(c, 7*inch, 5*inch)[1]
+    if table_height > 5*inch:
+        # Split the table into multiple tables
+        num_pages = int(table_height / 5*inch) + 1
+        for i in range(num_pages):
+            table_page = table.split(num_pages, i)
+            table_page.drawOn(c, 0.5*inch, 6*inch - i*5*inch)
+            if i < num_pages - 1:
+                c.showPage()
+    else:
+        table.drawOn(c, 0.5*inch, 6*inch)
+
+    # Save PDF and Display the download URL
+    c.save()
+    report_download_link = f"http://{get_ip_address()}/{user.username}_report.pdf"
+    flash(f'Report generated successfully. {report_download_link}', 'success')
+    return redirect(url_for('admin.admin_home'))
 
 @admin_route.route('/logout')
 @login_required

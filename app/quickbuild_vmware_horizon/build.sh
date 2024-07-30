@@ -83,17 +83,17 @@ done
 # Setup Vmware USB
 log_message "Setting up Vmware USB"
 cd "$VMWARE_BUILD_PATH/$BUILD_ID/007-vmware-view-horizon-$vmware_bundle_version/etc"
+mkdir rc.d
 rm -rf init.d/ftscan*
 rm -rf init.d/ftsprhv*
-chmod -R 755 *
-mkdir rc.d
+mv init.d rc.d/
 cd rc.d
-ln -s ../init.d .
 mkdir rc5.d
 cd rc5.d
-ln -s /etc/init.d/vmware-USBArbitrator K08vmware-USBArbitrator
-ln -s /etc/init.d/vmware-USBArbitrator S50vmware-USBArbitrator
-
+ln -s /etc/rc.d/init.d/vmware-USBArbitrator K08vmware-USBArbitrator
+ln -s /etc/rc.d/init.d/vmware-USBArbitrator S50vmware-USBArbitrator
+cd "$VMWARE_BUILD_PATH/$BUILD_ID/007-vmware-view-horizon-$vmware_bundle_version/etc"
+chmod -R 755 *
 check_command "Setup Vmware USB"
 
 # Finalize the package

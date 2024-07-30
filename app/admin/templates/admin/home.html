@@ -24,7 +24,7 @@
                             </thead>
                             <tbody>
                                 {% for user in list_of_users %}
-                                    <tr >
+                                    <tr>
                                         <td><img src="{{url_for('static', filename='images/'+user.profile_image)}}" alt="mdo" width="32" height="32" class="rounded-circle"></td>
                                         <td>{{user.username}}</td>
                                         <td>{{user.email}}</td>
@@ -36,9 +36,18 @@
                                             {% endif %}
                                         </td>
                                         <td class="table-action">
-                                            <a href="{{url_for('admin.edit_user', user_id=user.id)}}"><i class="bi bi-pencil-fill" style="color: chocolate;"></i></a>
-                                            <a href="{{url_for('admin.delete_user', user_id=user.id)}}" class="ms-2"><i class="bi bi-person-x-fill" style="color: red;"></i></a>
-                                            <a href="{{url_for('admin.patch_info', user_id=user.id)}}" class="action-icon info ms-2"><i class="bi bi-info-circle"></i></a>
+                                            <a href="{{url_for('admin.edit_user', user_id=user.id)}}" class="text-decoration-none">
+                                                <i class="bi bi-pencil-fill" style="color: chocolate;"></i>
+                                            </a>
+                                            <a href="{{url_for('admin.delete_user', user_id=user.id)}}" class="ms-1 text-decoration-none">
+                                                <i class="bi bi-person-x-fill" style="color: red;"></i>
+                                            </a>
+                                            <a href="{{url_for('admin.patch_info', user_id=user.id)}}" class="ms-1 text-decoration-none">
+                                                <i class="bi bi-info-circle"></i>
+                                            </a>
+                                            <a href="{{url_for('admin.user_report', user_id=user.id)}}" class="ms-1 text-decoration-none">
+                                                <i class="bi bi-file-earmark-arrow-down-fill" style="color: seagreen;"></i>
+                                            </a>
                                         </td>
                                     </tr>
                                 {% endfor %}

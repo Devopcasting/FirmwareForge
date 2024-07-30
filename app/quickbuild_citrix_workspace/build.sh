@@ -113,6 +113,8 @@ ln -s /etc/rc.d/init.d/ctxcwalogd K08ctxcwalogd
 ln -s /etc/rc.d/init.d/ctxusbd K08ctxusbd
 ln -s /etc/rc.d/init.d/ctxcwalogd S50ctxcwalogd
 ln -s /etc/rc.d/init.d/ctxusbd S50ctxusbd
+cd "$CITRIX_BUILD_PATH/$BUILD_ID/002-Citrix-Workspace-$ICACLIENT_VERSION"
+chmod -R 755 etc/*
 check_command "Refactoring package contents"
 
 # Update the INI files
