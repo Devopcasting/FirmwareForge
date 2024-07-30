@@ -207,20 +207,20 @@ def user_report(user_id):
     c.drawString(1*inch, 7.8*inch, "Quick Firmware Update")
 
     # Create a table for firmware updates
-    data = [["Build Id","Client","Md5sum", "Patchname", "Patch size", "Build Date"]]
+    data = [["Build Id", "Client", "Patchname", "Md5sum", "Patch size", "Build Date"]]
     for firmware in quick_patch:
         client_paragraph = Paragraph(firmware.client_name, styles['Normal'])
         patchname_paragraph = Paragraph(firmware.firmware_name, styles['Normal'])
         data.append([
             str(firmware.firmware_build_id),
             client_paragraph,
-            firmware.md5sum,
             patchname_paragraph,
+            firmware.md5sum,
             str(firmware.firmware_size),
             firmware.build_date.strftime('%d-%m-%Y')
         ])
     
-    table = Table(data, colWidths=[0.6*inch, 1.2*inch, 0.8*inch, 2.4*inch, 0.8*inch, 0.8*inch])
+    table = Table(data, colWidths=[0.6*inch, 1.2*inch, 2.4*inch, 0.6*inch, 0.8*inch, 0.8*inch])
 
     table.setStyle(TableStyle([
         ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
