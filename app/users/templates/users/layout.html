@@ -24,15 +24,20 @@
               {% else %}
                 <li><a href="{{url_for('users.users_home')}}" class="nav-link px-3 link-secondary">Home</a></li>
               {% endif %}
-              {% if title == 'Firmware'%}
-                <li><a href="#" class="nav-link px-3 link-success active" style="font-weight: bold;">Firmware</a></li>
+              {% if title == 'Build Firmware'%}
+                <li><a href="{{url_for('firmware.build_firmware')}}" class="nav-link px-3 link-success active" style="font-weight: bold;">Firmware</a></li>
               {% else %}
-                <li><a href="#" class="nav-link px-3 link-secondary">Firmware</a></li>
+                <li><a href="{{url_for('firmware.build_firmware')}}" class="nav-link px-3 link-secondary">Firmware</a></li>
               {% endif %}
               {% if title == 'Quick Firmware'%}
                 <li><a href="{{url_for('quickfirmware.quickfirmware')}}" class="nav-link px-3 link-success active" style="font-weight: bold;">Quick Firmware</a></li>
               {% else %}
                 <li><a href="{{url_for('quickfirmware.quickfirmware')}}" class="nav-link px-3 link-secondary">Quick Firmware</a></li>
+              {% endif %}
+              {% if title == 'Change Password' %}
+                <li><a href="{{url_for('users.change_password')}}" class="nav-link px-3 link-success active" style="font-weight: bold;">Change Password</a></li>
+              {% else %}
+                <li><a href="{{url_for('users.change_password')}}" class="nav-link px-3 link-secondary">Change Password</a></li>
               {% endif %}
             </ul>
             <a class="btn px-3 border-0 rounded-0 text-white" href="{{url_for('users.logout')}}" role="button" style="background-color: lightslategrey;">Logout</a>

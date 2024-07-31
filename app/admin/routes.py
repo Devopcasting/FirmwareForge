@@ -109,7 +109,7 @@ def patch_info(user_id):
     # Count total quick patch
     total_quick_patch = QuickFirmwareBuild.query.filter_by(user_id=user_id, status='success').count()
     quick_patch = QuickFirmwareBuild.query.filter_by(user_id=user_id, status='success').paginate(page=page, per_page=5)
-    return render_template('admin/patch_info.html', title="Patch Info", quickpatch=quick_patch, total_quick_patch=total_quick_patch)
+    return render_template('admin/patch_info.html', title="Patch Info", quickpatch=quick_patch, total_quick_patch=total_quick_patch,userid=user_id)
 
 # Delete Build
 @admin_route.route('/admin/delete/<int:id>')

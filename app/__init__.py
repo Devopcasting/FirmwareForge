@@ -41,3 +41,5 @@ from app.quickbuild_vmware_horizon.routes import quickbuild_vmware_horizon_route
 app.register_blueprint(quickbuild_vmware_horizon_route)
 from app.quickbuild_citrix_workspace.routes import quickbuild_citrix_workspace_route
 app.register_blueprint(quickbuild_citrix_workspace_route)
+from app.firmware.routes import firmware_build
+app.register_blueprint(firmware_build)

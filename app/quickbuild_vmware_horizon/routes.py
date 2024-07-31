@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, send_from_directory
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from app import db
@@ -44,6 +44,12 @@ def quickbuild_vmware_horizon():
         flash('Build started successfully!', 'success')
         return redirect(url_for('quickfirmware.quickfirmware'))
     return render_template('quickbuild_vmware_horizon/build.html', form=form)
+
+# Play Vmware view
+@quickbuild_vmware_horizon_route.route('/video/<filename>')
+@login_required
+def video(filename):
+    return send_from_directory('static/videos', filename)
 
 # Create random folder name in vmware horizon build path
 def create_random_folder():

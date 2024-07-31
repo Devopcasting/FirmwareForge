@@ -36,11 +36,13 @@ touch "$VMWARE_BUILD_PATH/$BUILD_ID/locked"
 
 # Get the vmware bundle name
 vmware_bundle_name=$(basename "$VMWARE_SOURCE_URL")
-
+echo $vmware_bundle_name &>> "$LOG_PATH"
 # Get the vmware bundle version
 vmware_bundle_version=$(echo "$vmware_bundle_name" | grep -oP '\d+\.\d+-\d+\.\d+\.\d+-\d+')
 # Convert '-' to '_' in vmware bundle version
 vmware_bundle_version=$(echo "$vmware_bundle_version" | sed 's/-/_/g')
+
+echo $vmware_bundle_version &>> "$LOG_PATH"
 
 # Download the latest Vmware view Horizon release
 latest_vmware_url="$VMWARE_SOURCE_URL"
@@ -71,12 +73,12 @@ for file in *; do
     # Check if user folder exists
     if [ -d "usr" ]; then
         # Copy usr folder contents to "007-vmware-view-horizon-$vmware_bundle_version/usr". Redirect the verbose to log
-        cp -pva usr/* ../../"007-vmware-view-horizon-$vmware_bundle_version/usr" &>> "$LOG_PATH"
+        cp -pva usr/* ../../"007-vmware-view-horizon-$vmware_bundle_version/usr"
     fi
     # Check if etc folder exists
     if [ -d "etc" ]; then
         # Copy etc folder contents to "007-vmware-view-horizon-$vmware_bundle_version/etc"
-        cp -pva etc/* ../../"007-vmware-view-horizon-$vmware_bundle_version/etc" &>> "$LOG_PATH"
+        cp -pva etc/* ../../"007-vmware-view-horizon-$vmware_bundle_version/etc"
     fi
     cd ..
 done
