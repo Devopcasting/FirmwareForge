@@ -110,6 +110,14 @@ mkdir -p "$VMWARE_BUILD_PATH/$BUILD_ID/007-vmware-view-horizon-$vmware_bundle_ve
 if [ -f "$VMWARE_BUILD_PATH/$BUILD_ID/007-vmware-view-horizon-$vmware_bundle_version/usr/lib/vmware/view/integratedPrinting/prlinuxcupsppd" ];then
     cp -pva "$VMWARE_BUILD_PATH/$BUILD_ID/007-vmware-view-horizon-$vmware_bundle_version/usr/lib/vmware/view/integratedPrinting/prlinuxcupsppd" "$VMWARE_BUILD_PATH/$BUILD_ID/007-vmware-view-horizon-$vmware_bundle_version/usr/lib/cupsPPD"
 fi
+
+# Enable Virtual Printing
+log_message "Enabling Virtual Printing"
+cd "$VMWARE_BUILD_PATH/$BUILD_ID/007-vmware-view-horizon-$vmware_bundle_version/etc"
+echo "printSvc.enable=TRUE" >> vmware/config
+echo "PrintRedirEnable=TRUE" >> vmware/viewagent-custom.conf
+check_command "Enable Virtual Printing"
+
 cd "$VMWARE_BUILD_PATH/$BUILD_ID/007-vmware-view-horizon-$vmware_bundle_version"
 mkdir pkgs
 find . > pkgs/"007-vmware-view-horizon-$vmware_bundle_version"

@@ -1,0 +1,118 @@
+{% extends 'users/layout.html'%}
+{% block content %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{url_for('users.users_home')}}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{url_for('firmware.build_firmware')}}">Firmware</a></li>
+            <li class="breadcrumb-item active" aria-current="page">New Firmware Build</li>
+        </ol>
+    </nav>
+    <form method="post" action="" class="mt-5 form-horizontal" id="buildForm"  enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <div class="row">
+            <div class="col">
+                <div class="row mb-3">
+                    <label for="inputEmail3" class="col-3 col-form-label">Client name</label>
+                    <div class="col-9">
+                        {{form.client_name(class="form-control")}}  
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <label for="inputEmail3" class="col-3 col-form-label">Patch name</label>
+                    <div class="col-9">
+                        {{form.patch_name(class="form-control")}}  
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <label for="inputPassword3" class="col-3 col-form-label">Description</label>
+                    <div class="col-9">
+                        {{form.description(class="form-control")}}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <label for="inputPassword3" class="col-3 col-form-label">Install Script</label>
+                    <div class="col-9">
+                        {{form.install_script(class="form-control", rows=10, cols=50)}}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="container py-3">
+                        <pre style="max-height: 300px; overflow-y: auto;">
+                            grep "Avaya-Agent-Desktop" /sda1/data/menu.orig
+                            status=$?
+
+                            if [ $status -ne 0 ]
+                            then
+                                menu_entry='prog "Avaya-Agent-Desktop" "/usr/share/pixmaps/agent.png" su vxl -c "/usr/bin/Agent-launcher"'
+                                sed -i '/\sprog "AnyConnect.*/a '"$menu_entry"'' /sda1/data/menu.orig
+                            else
+                                sed -i '/Avaya/d' /sda1/data/menu.orig
+                                menu_entry='prog "Avaya-Agent-Desktop" "/usr/share/pixmaps/agent.png" su vxl -c "/usr/bin/Agent-launcher"'
+                                sed -i '/\sprog "AnyConnect.*/a '"$menu_entry"'' /sda1/data/menu.orig
+                            fi
+
+                            cp /sda1/data/menu.orig /data/menu.orig
+                            cp /sda1/data/menu.orig /data/menu
+                            cp /sda1/data/menu.orig /sda1/data/menu
+                        </pre>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <label for="files" class="col-3 col-form-label">Upload Files</label>
+                    <div class="col-9">
+                        {{ form.files(class="form-control", id="files") }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-9 offset-3">
+                        <ul id="fileList"></ul>
+                    </div>
+                </div>
+            </div>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            {{ form.submit(class="btn btn-primary btn-sm me-md-2")}}    
+        </div>
+        
+    </form>
+    <script>
+        let selectedFiles = [];
+
+        document.getElementById('files').addEventListener('change', function(event) {
+            let fileList = document.getElementById('fileList');
+
+            // Append new files to the selectedFiles array
+            for (let i = 0; i < this.files.length; i++) {
+                selectedFiles.push(this.files[i]);
+            }
+
+            // Clear the file list display
+            fileList.innerHTML = '';
+
+            // Display the selected files
+            for (let i = 0; i < selectedFiles.length; i++) {
+                let li = document.createElement('li');
+                li.textContent = selectedFiles[i].name;
+                fileList.appendChild(li);
+            }
+
+            // Update the form files input with the selected files
+            let dataTransfer = new DataTransfer();
+            for (let i = 0; i < selectedFiles.length; i++) {
+                dataTransfer.items.add(selectedFiles[i]);
+            }
+            this.files = dataTransfer.files;
+        });
+        // Disable Executable and Icon Path inputs initially
+        document.getElementById('display_name').disabled = true;
+        document.getElementById('executable').disabled = true;
+        document.getElementById('icon').disabled = true;
+
+        // Enable/disable inputs based on Menu Entry checkbox
+        document.getElementById('menuEntry').addEventListener('change', function() {
+            let isChecked = this.checked;
+            document.getElementById('display_name').disabled = !isChecked;
+            document.getElementById('executable').disabled = !isChecked;
+            document.getElementById('icon').disabled = !isChecked;
+        });
+    </script>
+{% endblock content %}

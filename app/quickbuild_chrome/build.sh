@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-
+set -x
 # Function to log messages
 log_message() {
     echo -e "$1\n" >> "$LOG_PATH"
