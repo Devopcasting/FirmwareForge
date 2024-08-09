@@ -91,7 +91,72 @@
                         Firmwares
                     </h5>
                 </div>
-                
+                <div class="card-body pt-0">
+                    {% if total_patch == 0 %}
+                        <div class="alert alert-info mt-3" role="alert">
+                            No Firmware found.
+                        </div>
+                    {% else %}
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Client</th>
+                                    <th scope="col">Patch</th>
+                                    <th scope="col">Size</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for firmware in firmware %}
+                                    <tr>
+                                        <td>{{firmware.md5sum}}</td>
+                                        <td>{{firmware.client_name}}</td>
+                                        <td>{{firmware.firmware_name}}</td>
+                                        <td>{{firmware.firmware_size}}</td>
+                                        <td>
+                                            <a href="#" class="action-icon delete"><i class="bi bi-x-circle" style="color: firebrick;"></i></a>
+                                            <a href="#" class="action-icon info ms-2"><i class="bi bi-info-circle"></i></a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <nav>
+                            <ul class="pagination">
+                                {% if firmware.has_prev %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('admin.patch_info', user_id=userid, page=firmware.prev_num) }}">Previous</a>
+                                </li>
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">Previous</span>
+                                </li>
+                                {% endif %}
+                                {% for page_num in firmware.iter_pages() %}
+                                {% if page_num %}
+                                <li class="page-item {% if page_num == firmware.page %}active{% endif %}">
+                                    <a class="page-link" href="#">{{ page_num }}</a>
+                                </li>
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                                {% endif %}
+                                {% endfor %}
+                                {% if firmware.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="#">Next</a>
+                                </li>
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">Next</span>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>

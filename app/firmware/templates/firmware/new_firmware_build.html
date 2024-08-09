@@ -36,25 +36,51 @@
                     </div>
                 </div>
                 <div class="row mb-3">
-                    <div class="container py-3">
-                        <pre style="max-height: 300px; overflow-y: auto;">
-                            grep "Avaya-Agent-Desktop" /sda1/data/menu.orig
-                            status=$?
-
-                            if [ $status -ne 0 ]
-                            then
-                                menu_entry='prog "Avaya-Agent-Desktop" "/usr/share/pixmaps/agent.png" su vxl -c "/usr/bin/Agent-launcher"'
-                                sed -i '/\sprog "AnyConnect.*/a '"$menu_entry"'' /sda1/data/menu.orig
-                            else
-                                sed -i '/Avaya/d' /sda1/data/menu.orig
-                                menu_entry='prog "Avaya-Agent-Desktop" "/usr/share/pixmaps/agent.png" su vxl -c "/usr/bin/Agent-launcher"'
-                                sed -i '/\sprog "AnyConnect.*/a '"$menu_entry"'' /sda1/data/menu.orig
-                            fi
-
-                            cp /sda1/data/menu.orig /data/menu.orig
-                            cp /sda1/data/menu.orig /data/menu
-                            cp /sda1/data/menu.orig /sda1/data/menu
-                        </pre>
+                    <label for="inputPassword3" class="col-3 col-form-label"></label>
+                    <div class="col-9">
+                        <div class="form-check">
+                            {{form.restore(class="form-check-input")}}
+                            <label class="form-check-label">
+                                Restore Factory Settings
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <label for="inputPassword3" class="col-3 col-form-label"></label>
+                    <div class="col-9">
+                        <div class="form-check">
+                            {{form.menu(class="form-check-input",id="menuEntry")}}
+                            <label class="form-check-label" for="menuEntry">
+                                Menu
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="border p-3 mb-3">
+                    <div class="row mb-3">
+                        <label for="inputPassword3" class="col-3 col-form-label">Program name</label>
+                        <div class="col-9">
+                            {{form.program_name(class="form-control", id="display_name")}}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="inputPassword3" class="col-3 col-form-label">Executable Path</label>
+                        <div class="col-9">
+                            {{form.executable(class="form-control", id="executable")}}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="inputPassword3" class="col-3 col-form-label">Icon Path</label>
+                        <div class="col-9">
+                            {{form.icon(class="form-control", id="icon")}}
+                        </div>  
+                    </div>
+                    <div class="row mb-3">
+                        <label for="files" class="col-3 col-form-label">User</label>
+                        <div class="col-9">
+                            {{ form.executable_user(class="form-control", id="user") }}
+                        </div>
                     </div>
                 </div>
                 <div class="row mb-3">
@@ -106,6 +132,7 @@
         document.getElementById('display_name').disabled = true;
         document.getElementById('executable').disabled = true;
         document.getElementById('icon').disabled = true;
+        document.getElementById('user').disabled = true;
 
         // Enable/disable inputs based on Menu Entry checkbox
         document.getElementById('menuEntry').addEventListener('change', function() {
@@ -113,6 +140,7 @@
             document.getElementById('display_name').disabled = !isChecked;
             document.getElementById('executable').disabled = !isChecked;
             document.getElementById('icon').disabled = !isChecked;
+            document.getElementById('user').disabled = !isChecked;
         });
     </script>
 {% endblock content %}

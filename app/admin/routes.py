@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user, logout_user
 from app import db, bcrypt
 from app.admin.forms import AddUserForm, EditUserForm
-from app.models import User,QuickFirmwareBuild
+from app.models import User,QuickFirmwareBuild,FirmwareBuild
 from functools import wraps
 import subprocess
 import os
@@ -109,7 +109,10 @@ def patch_info(user_id):
     # Count total quick patch
     total_quick_patch = QuickFirmwareBuild.query.filter_by(user_id=user_id, status='success').count()
     quick_patch = QuickFirmwareBuild.query.filter_by(user_id=user_id, status='success').paginate(page=page, per_page=5)
-    return render_template('admin/patch_info.html', title="Patch Info", quickpatch=quick_patch, total_quick_patch=total_quick_patch,userid=user_id)
+    # Count total firmware patch
+    total_firmware_patch = FirmwareBuild.query.filter_by(user_id=user_id, status='success').count()
+    firmware_patch = FirmwareBuild.query.filter_by(user_id=user_id, status='success').paginate(page=page, per_page=5)
+    return render_template('admin/patch_info.html', title="Patch Info", quickpatch=quick_patch, total_quick_patch=total_quick_patch,userid=user_id, firmware=firmware_patch, total_firmware=total_firmware_patch)
 
 # Delete Build
 @admin_route.route('/admin/delete/<int:id>')
@@ -248,9 +251,11 @@ def user_report(user_id):
 
     # Save PDF and display the download URL
     c.save()
-    report_download_link = f"http://{get_ip_address()}/{user.username}_report.pdf"
+    report_download_link = f"http://{get_ip_address()}/repo/{user.username}_report.pdf"
+    print(report_download_link)
     flash(Markup(f'Report generated successfully. <a href="{report_download_link}" target="_blank">Download it here</a>'), 'success')
     return redirect(url_for('admin.admin_home'))
+
 @admin_route.route('/logout')
 @login_required
 def logout():

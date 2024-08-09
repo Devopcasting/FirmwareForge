@@ -132,7 +132,7 @@ check_command "Corrupting tarball"
 
 # Move tarball to web directory
 log_message "Moving tarball to web directory"
-web_dir="/var/www/html/$BUILD_ID"
+web_dir="/var/www/html/repo/$BUILD_ID"
 sudo mkdir -p "$web_dir"
 sudo chmod 755 "$web_dir"
 sudo cp "$final_tarball" "$web_dir"

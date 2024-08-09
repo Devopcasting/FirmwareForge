@@ -190,7 +190,7 @@ check_command "Corrupting the final tarball"
 
 # Move the final tarball to the web directory
 log_message "Moving the final tarball to the web directory"
-web_dir="/var/www/html/$BUILD_ID"
+web_dir="/var/www/html/repo/$BUILD_ID"
 mkdir -p "$web_dir"
 chmod -R 755 "$web_dir"
 cp "$final_tarball" "$web_dir"

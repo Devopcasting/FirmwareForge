@@ -115,7 +115,7 @@ def start_build(log_path, user_id, build_id):
             build.firmware_name = patch_name
             build.firmware_size = patch_size
             build.firmware_log = log_content
-            build.download_link = f"http://{ip_address}/{build_id}/{patch_name}.tar.bz2"
+            build.download_link = f"http://{ip_address}/repo/{build_id}/{patch_name}.tar.bz2"
             build.status = 'success'
             build.md5sum = md5sum
             # Remove all the contents inside the build except patch and log

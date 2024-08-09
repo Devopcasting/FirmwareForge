@@ -5,7 +5,7 @@
             <li class="breadcrumb-item"><a href="{{url_for('users.users_home')}}">Home</a></li>
             <li class="breadcrumb-item active" aria-current="page">Quick Firmware</li>
         </ol>
-    </nav>
+    </nav> 
     <div class="container">
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
             <!-- {% if total == 0 %}
@@ -99,7 +99,7 @@
                                                 <!-- <a href="{{url_for('quickfirmware.quickfirmware_delete', id=firmware.id)}}" class="action-icon delete"><i class="bi bi-x-circle" style="color: firebrick;"></i></a> -->
                                                 <a href="{{url_for('quickfirmware.quickfirmware_failed_log', id=firmware.id)}}" class="action-icon info"><i class="bi bi-info-circle"></i></a>
                                             {% else %}
-                                                <a href="{{firmware.firmware_download_link}}" class="action-icon download text-decoration-none text-dark" target="_blank"><i class="bi bi-download"></i></a>
+                                                <a href="{{firmware.download_link}}" class="action-icon download text-decoration-none text-dark" target="_blank"><i class="bi bi-download"></i></a>
                                                 <!-- <a href="{{url_for('quickfirmware.quickfirmware_delete', id=firmware.id)}}" class="action-icon delete"><i class="bi bi-x-circle" style="color: firebrick;"></i></a> -->
                                                 <a href="{{url_for('quickfirmware.quickfirmware_info', id=firmware.id)}}" class="action-icon info"><i class="bi bi-info-circle"></i></a>
                                             {% endif %}

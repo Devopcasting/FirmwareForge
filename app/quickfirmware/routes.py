@@ -13,7 +13,7 @@ import os
 quickfirmware_route = Blueprint('quickfirmware', __name__, template_folder="templates")
 
 # Download Folder path
-PATCH_DOWNLOAD_FOLDER = "/var/www/html/"
+PATCH_DOWNLOAD_FOLDER = "/var/www/html/repo/"
 
 # QuickFirmware dashboard
 @quickfirmware_route.route('/quickfirmware')
